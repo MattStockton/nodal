@@ -44,9 +44,15 @@
 <script src="static/js/nodal.js"></script>
 <script>
 $(document).ready(function(){
+	var rate_limit_remaining = 1000;
+	
 	$(".js-github-login").on("click",function(){
 		window.location = "https://github.com/login/oauth/authorize?scope=user&client_id=" + "{{ client_id }}";
 	});
+	
+    Nodal.add_stats_listener(function (data) {
+    	rate_limit_remaining = data.API_RateLimit_Remaining;
+    });
 	
 	$("#search_form").hide();
 	
@@ -60,6 +66,11 @@ $(document).ready(function(){
                 callback(formatted_matches);
             }
 
+            if(rate_limit_remaining <= 0){
+            	// TODO KG Style
+            	alert("No more API calls remaining! Login to continue trying Nodal out");
+            	return;
+            }
             Nodal.search(request.term, format_data);
         },
         select: function (evt, ui) {
