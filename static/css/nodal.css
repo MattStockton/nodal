@@ -10,48 +10,15 @@ html .clearfix:after {
 	clear: both;
 }
 
-circle.node {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-
-line.link {
-  stroke: #999;
-  stroke-opacity: .6;
-}
-
-g.expanded rect.expanded-bg {
-	fill: #0572CE;
-}
-g.expanded text {
-	fill: #FFF;
-}
-
-g.person:hover {
-	cursor: pointer;
-}
-
-g.expanded:hover {
-	cursor: move;
-}
-
-g.expanded text.close-expanded {
-	font-size: 12px;
-	fill: #ACCAE3;
-}
-g.expanded text.close-expanded:hover {
-	cursor: pointer;
-}
-
+/* top */
 #meta {
 	z-index: 9999;
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
-	background: #F5F5F5;
+	background: #EEEEE8;
 }
-
 .btn {
 	cursor: pointer;
 	background: #ffffff; /* Old browsers */
@@ -62,7 +29,6 @@ g.expanded text.close-expanded:hover {
 	background: -ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* IE10+ */
 	background: linear-gradient(to bottom,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
-	
 	border: 1px solid #DDD;
 	color: #333;
 	-webkit-border-radius: 3px;
@@ -112,12 +78,11 @@ g.expanded text.close-expanded:hover {
 	line-height: 1em;
 	border: 1px solid #F0F0A2;
 }
-
 #sliders {
 	display: none;
 	padding: 10px 0;
 	text-align: center;
-	background: #F1F1F1;
+	background: #EEEEE8;
 }
 #sliders .slider {
 	display: inline-block;
@@ -141,24 +106,64 @@ input[type=range] {
 	
 }
 
-g.expanded-node-button:hover {
+
+/* chart */
+#chart {
+	margin-top: 50px;
+}
+circle.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+line.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+g.name-hover rect {
+	fill: #000;
+	opacity: 0.7;
+}
+g.name-hover text {
+	fill: #FFF;
+	font-size: 12px;
+}
+g.expanded rect.expanded-bg {
+	fill: #EEEEE8;
+}
+g.expanded text {
+	fill: #333;
+}
+g.person:hover {
 	cursor: pointer;
 }
-g.expanded-node-button rect.expanded-node-button-bg {
-	fill: #cf0404;
+g.expanded:hover {
+	cursor: move;
 }
-g.expanded-node-button text {
-	fill: #FFF;
+g.expanded text.close-expanded {
+	font-size: 12px;
+	fill: #999;
+}
+g.expanded text.close-expanded:hover {
+	cursor: pointer;
+}
+g.show-connections:hover {
+	cursor: pointer;
+}
+g.show-connections rect.show-connections-bg {
+	fill: #D8D8C8;
+}
+g.show-connections text {
+	fill: #555;
 	font-size: 11px;
 }
-
+g.show-connections text:hover {
+	fill: #000;
+}
 circle.aux-border {
 	fill-opacity: 0;
 	stroke: #FFF;
 	stroke-width: 5;
 }
-
-
 .selection-modal {
 	position: absolute;
 	background: #F7F7F7;
@@ -230,8 +235,9 @@ circle.aux-border {
 
 
 
+/* login */
 body.login {
-	background: #222;
+	background: #FFF;
 }
 #login {
 	margin: 50px auto;
@@ -249,4 +255,11 @@ body.login {
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	border: none;
+}
+.login button {
+	border: none;
+	background: url(../images/github-logo-btn.png) no-repeat 10px 10px #E9E9E9;
+	color: #555;
+	font-size: 18px;
+	padding: 15px 25px 15px 50px;
 }
