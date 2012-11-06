@@ -462,6 +462,9 @@
 				initialPersonNode.name = initialPersonData.displayName;
 				initialPersonNode.group = getNextGroup();
 				initialPersonNode.picture = initialPersonData.scaledPictureURL;
+				initialPersonData.x = window.innerWidth / 2;
+				initialPersonData.y = window.innerHeight / 2;
+				initialPersonData.fixed = true;
 
 				force.nodes().push(initialPersonNode);
 
