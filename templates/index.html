@@ -304,7 +304,7 @@
 				$("#loading").show();
 
 				var logins = _.pluck(selectedPeople, "login");
-				
+
 				var done_callback = function(){
 					$("#loading").hide();
 				};
@@ -357,7 +357,8 @@
 	var getAndMergeFollowers = function (id, callback) {
 
 		var groupToUse = getNextGroup();
-		HQ.getFollowers(id, function (followerData) {
+		Nodal.get_social_network(id, function (network) {
+			var followerData = {items:network};
 			var source = null, sourceNode = null,
 				i = 0;
 
@@ -454,7 +455,7 @@
 				redrawGraphsAndNodes();
 			});
 		} else {
-			HQ.getPerson(initialPersonId, function (initialPersonData) {
+			Nodal.get_user_detail(initialPersonId, function (initialPersonData) {
 				var initialPersonNode = initialPersonData,
 					nodes, i;
 
@@ -551,7 +552,7 @@
           .text("Open Profile")
           .attr("x", 5)
           .attr("y", 14);
-		
+
 		d3Element
 			.append("svg:text")
 			.attr("class","close-expanded")
