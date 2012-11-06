@@ -36,7 +36,8 @@ def index():
 
 @app.route("/without-login", methods=['GET'])
 def index_without_login():
-	return render_template("index.html", access_token="")
+	username = request.args.get('username',"");
+	return render_template("index.html", access_token="", start_username=username)
 
 @app.route('/githubauth', methods=['GET'])
 def github_auth():

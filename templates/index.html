@@ -70,6 +70,7 @@
 <script type="text/javascript">
 
     var github_access_token = "{{access_token}}";
+    var start_username = "{{start_username}}";
 
 	var width = $(window).width() - 20,
 		height = $(window).height() - 54,
@@ -321,8 +322,12 @@
 		});
 
 		// initially load currently logged in person's network
-		loadPerson();
-
+		if(start_username){
+			loadPerson(start_username);
+		} else {
+			loadPerson();		
+		}
+	
 		$("#search_field")
 			.autocomplete({
 				source:function (request, callback) {

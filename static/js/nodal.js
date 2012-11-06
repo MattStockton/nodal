@@ -26,7 +26,7 @@
 			},
 
 			get: function (url, callback) {
-				return $.get(url, url, GitHubNodal.Util.catch_api_call(callback), "json");
+				return $.get(url, GitHubNodal.Util.catch_api_call(callback), "json");
 			},
 
 			put: function (url, callback) {
