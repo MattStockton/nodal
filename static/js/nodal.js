@@ -3,8 +3,47 @@
 	var Nodal = root.Nodal = {};
 	var log = function (msg) { console.log(msg); };
 
+	var listeners = {};
+	var signal_listeners = function (component, data) {
+		if (listeners[component]) {
+			_.each(listeners[component], function (func) { func(data); });
+		}
+	};
+
 	var GitHubNodal = {
-		API_BASE_URL: "https://api.github.com/"
+		API_BASE_URL: "https://api.github.com/",
+
+		Util: {
+			catch_api_call: function (callback) {
+				return function (data, text_status, jqXHR) {
+					GitHubNodal.Stats.API_RateLimit_Limit = jqXHR.getResponseHeader("X-RateLimit-Limit");
+					GitHubNodal.Stats.API_RateLimit_Remaining = jqXHR.getResponseHeader("X-RateLimit-Remaining");
+
+					signal_listeners("Stats", GitHubNodal.Stats);
+
+					if (callback) callback(data, text_status, jqXHR);
+				}
+			},
+
+			get: function (url, callback) {
+				$.get(url, url, GitHubNodal.Util.catch_api_call(callback), "json");
+			},
+
+			post: function (url, data, callback) {
+				$.post(url, data, GitHubNodal.Util.catch_api_call(callback), "json");
+			},
+
+			add_listener: function (component, callback) {
+				if (!listeners[component])
+					listeners[component] = [];
+				listeners[component].push(callback);
+			}
+		},
+
+		Stats: {
+			API_RateLimit_Limit: 0,
+			API_RateLimit_Remaining: 0,
+		}
 	};
 
 	GitHubNodal.get_social_network = function (username, callback) {
@@ -16,7 +55,7 @@
 				follower["relationship"] = ["follower"];
 				social_network.push(follower);
 			});
-			$.get(GitHubNodal.api_url("users/" + username + "/following"), handle_following, "json");
+			GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username + "/following"), handle_following);
 		};
 		var handle_following = function (data, text_status, jqXHR) {
 			log("Following count: " + data.length);
@@ -34,7 +73,7 @@
 			if (callback) callback(social_network);
 		};
 
-		$.get(GitHubNodal.api_url("users/" + username + "/followers"), handle_followers, "json");
+		GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username + "/followers"), handle_followers);
 	};
 
 	GitHubNodal.get_user_detail = function (username, callback) {
@@ -45,9 +84,9 @@
 		};
 
 		if (username) {
-			$.get(GitHubNodal.api_url("users/" + username), handler, "json");
-		} else {
-			$.get(GitHubNodal.api_url("user", handler, "json"), handler, "json");
+			GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username), handler);
+		} else if (GitHubNodal.get_access_token()) {
+			GitHubNodal.Util.get(GitHubNodal.api_url("user", handler, "json"), handler);
 		}
 	};
 	
@@ -79,11 +118,14 @@
 	};
 
 	GitHubNodal.get_access_token = function () {
-		return github_access_token;
-	};
+		if (window.github_access_token)
+			return "?access_token=" + github_access_token;
+		else
+			return "";
+	}
 
 	GitHubNodal.api_url = function (endpoint) {
-		return GitHubNodal.API_BASE_URL + endpoint + "?access_token=" + GitHubNodal.get_access_token();
+		return GitHubNodal.API_BASE_URL + endpoint + GitHubNodal.get_access_token();
 	};
 
 	GitHubNodal.search = function (term, callback) {
@@ -103,11 +145,12 @@
 			}
 		};
 
-		$.get(GitHubNodal.api_url("legacy/user/search/" + term), handle_keyword_results, "json");
+		GitHubNodal.Util.get(GitHubNodal.api_url("legacy/user/search/" + term), handle_keyword_results);
 	};
 
 	Nodal.get_social_network = GitHubNodal.get_social_network;
 	Nodal.get_user_detail = GitHubNodal.get_user_detail;
 	Nodal.search = GitHubNodal.search;
 	Nodal.follow_users = GitHubNodal.follow_users;
+	Nodal.add_stats_listener = function (callback) { GitHubNodal.Util.add_listener("Stats", callback); };
 })();
