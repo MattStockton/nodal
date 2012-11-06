@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Nodal</title>
+	<script type="text/javascript" src="static/js/d3.v2.js"></script>
+
+	<link type="text/css" rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.24.custom.css"/>
+	<link type="text/css" rel="stylesheet" href="static/css/nodal.css"/>
+
+</head>
+<body>
+
+<div id="meta">
+	<div id="sliders">
+		<div class="slider">
+			<label>Link Distance</label>
+			<input type="range" id="force_linkdistance" min="0" max="1000" value="120" step="10"/>
+			<span id="force_linkdistance_val">120</span>
+		</div>
+		<div class="slider">
+			<label>Link Strength</label>
+			<input type="range" id="force_linkstrength" min="0" max="1" value="0.5" step="0.05"/>
+			<span id="force_linkstrength_val">0.5</span>
+		</div>
+		<div class="slider">
+			<label>Friction</label>
+			<input type="range" id="force_friction" min="0" max="1" value="0.4" step="0.01"/>
+			<span id="force_friction_val">0.4</span>
+		</div>
+		<div class="slider">
+			<label>Charge</label>
+			<input type="range" id="force_charge" min="-1000" max="1000" value="-150" step="10"/>
+			<span id="force_charge_val">-150</span>
+		</div>
+		<div class="slider">
+			<label>Theta</label>
+			<input type="range" id="force_theta" min="0" max="1" value="0.8" step="0.05"/>
+			<span id="force_theta_val">0.8</span>
+		</div>
+		<div class="slider">
+			<label>Gravity</label>
+			<input type="range" id="force_gravity" min="0" max="1" value="0.03" step="0.03"/>
+			<span id="force_gravity_val">0.03</span>
+		</div>
+	</div>
+	<div id="logo">
+		<img src="/static/images/logo.png">
+	</div>
+	<div id="nav" class="clearfix">
+		<div id="header_buttons">
+			<button id="adjust_phyics" type="button" class="btn">Adjust Physics</button>
+			<button id="logout" type="button" class="btn">Logout</button>
+		</div>
+		<div id="search_form">
+			<input id="search_field" placeholder="Search for a name..."/>
+		</div>
+		<div id="loading"><span><img src="/static/images/loading.gif" height="12" alt="Loading..."></span></div>
+	</div>
+</div>
+
+<div id="chart"></div>
+
+<script src="static/js/jquery-1.8.2.min.js"></script>
+<script src="static/js/jquery-ui-1.8.24.custom.min.js"></script>
+<script src="static/js/underscore-min.js"></script>
+<script src="static/js/nodal.js"></script>
+<script src="static/data-loader.js"></script>
+<script type="text/javascript">
+
+    var github_access_token = "{{access_token}}";
+
+	var width = $(window).width() - 20,
+		height = $(window).height() - 5,
+		numCenterNodes = 0,
+		color = d3.scale.category20(),
+		force = d3.layout.force();
+
+	var missingImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAEBUlEQVRYw4VYCXIjIQzk//9b7xDHThwfycaxA7xg5TmgpRbjqikXwwASrdblkHJJOben6NflyTLfPpXHQyvzMjMN6qusnMfLb64z47IwvhTcgNtwaUapeChpvyy2x+YqHg8XJcwRWd8PVcmk2bKLt+ir0/kGs2DwQU0TqGyUM0j0RCIGsxErzCBxQqJ0YPdM4J2iedO+tmXGBI1bj0EAxpVsjVIQ6gz8sqYp2vz1EyCa9RoiZvEkgYHNAou2EeCRabqMgaRuCS4fXSqp22urGdq6CukHmDtygq1ejC8lLbvezMLuBQ9jF2u15h3aFo4rk0cgPxIaSHGFrExhA71DBTXHIfWdyB2AyPYQdHXLpPoatI6aNRTaPO/XIBMZkbkERslkjqLjHRu49CDR3NS3Ii3Zy4KziJyWSfOb0sfpNGy3mxj/DIM8Mj6ezzLf1CoueY0RC+QOT16FywSx75+fl91ukj09iypR5q+3G8PmntM4Uc3jfPboKXfd7vcib5IKg1mhl92+4pFN9NTaVN4EmxWRQZ5TCeYgMiIe9ZE13QDabFSUEuBCmpuU1eT378uLKxh0imIdThCcjKo2wc1GbhUjr/+uVxRZqUB6DLJSG7QkLk0wYq6ERQPm6XJZsQJQZDh/fjruRtFoeg0m/SRVltl0NRIC3WFwX+URB+aKhGIx1hPsCJ7iSbFykRrjAkA03DTlmUnlKCUkTwkuUKfNcj+Q7dpinj/OSLScnKgMqJMhexWKm/qAmJEixEjSWKk6EpNCk/I7TGCJXACysA29t/t9Ey3yGweV4fb765c2Tk6o5si+jgY3GcTX1/U4ITrJGq5ceq1Dq7aJGZY71Uzn2UuHftCM4skrhR03V8EWov1CqG6W7NAH45E73NizMhMM5tlN6xrGe0odB3k8kr2ek10DE7hgMRkVq0Uh5vnyuXt/Z0NUeu4PBzGHEJPMz15aVBvYbxTnmcvX15jBTdZQqhg32e7fZJfTP3IbuNbyjr/i8VI19RyBs4ZRSPbOyawVLhbgwH8HYJlzqCGyHk1x4llmfwwOx6MpEFUCy8Vp0KbB4XjiWsG9t5vNzVjuo/qa3DEHDm7335XLVbQ38QkquEB47fZhtiFGJraz/HQ1eDhFXfypZZepyKD/P4Jt5hdt3j4+VrODI6mDSpuUMzkh5DmVY4xayDEV9a4rutF6WgkFX/SC6Y5bX9sQY8zwT+zf1dSbOtm2MXDC7crhfwFpYEhqXE1aK8xQX6Vx4nYmJNtitKp6MxYpmxifugCxBOFRCH1ff8y/WHOcyJS3VFUNYGwi3NJGrdhPKG2yZnmVRbP3b2Gtqvto0ycPLUbiUQBnNkcuXIFpJTq2cOgSXQzQcZYOUaWq//5preSxUIdvAAAAAElFTkSuQmCC";
+
+
+	$("#search_form").hide();
+
+	var colorsArray = ["#5505CE", "#BA05CE", "#72A50A", "#AF5D00", "#BBB"];
+	var selectedPeople = [];
+
+	var rectData = {
+		startX : 0,
+		startY : 0,
+		endX : 0,
+		endY : 0,
+
+		resetRectSelection : function(){
+			this.startX = 0;
+			this.startY = 0;
+			this.endX = 0;
+			this.endY = 0;
+		},
+
+		calculateSelectedPeople: function(people){
+			var selected = [];
+			var me = this;
+			people.each(function(d){
+				var isSelected = Math.min(me.startX, me.endX) != 0
+						&& Math.min(me.startY, me.endY) != 0
+					    && d.x > Math.min(me.startX, me.endX)
+						&& d.x < Math.max(me.startX, me.endX)
+						&& d.y > Math.min(me.startY, me.endY)
+						&& d.y < Math.max(me.startY, me.endY);
+
+				if(isSelected){
+					selected.push(d);
+				}
+			});
+
+			return selected;
+		}
+	};
+
+	var isMouseDown = false;
+
+	force.linkDistance(120)
+		.linkStrength(0.5)
+		.size([width, height])
+		.charge(function(d){ return d.center ? -150 : -300;})
+		.gravity(0.5)
+		.friction(0.4);
+
+	var svg = d3.select("#chart").append("svg")
+								.attr("width", width)
+								.attr("height", height);
+
+	svg.append("svg:clipPath")
+		.attr("id", "auxAvatarClip")
+		.append("svg:circle")
+		.style("stroke","#FFF")
+		.attr("cx", "20")
+		.attr("cy", "20")
+		.attr("r", 20);
+
+	svg.append("svg:clipPath")
+		.attr("id","centerAvatarClip")
+		.append("svg:circle")
+		.attr("cx", "24")
+		.attr("cy", "24")
+		.attr("r", 24);
+
+	var redrawGraphsAndNodes = function () {
+		redraw({nodes:force.nodes(),links:force.links()});
+	};
+
+	var redraw = function (json) {
+		force.nodes(json.nodes)
+			.links(json.links)
+			.start();
+
+		var link = svg.selectAll("line.link")
+			.data(json.links);
+
+		link.enter().append("line")
+		.attr("class", "link")
+		.style("stroke-width", function(d) { return Math.sqrt(d.value); })
+		.style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
+
+		link.exit().remove();
+
+		var tick = function() {
+			link.attr("x1", function(d) { return d.source.center ? d.source.x + 125 : d.source.x + 16; })
+				.attr("y1", function(d) { return d.source.center ? d.source.y + 32 : d.source.y + 16; })
+				.attr("x2", function(d) { return d.target.center ? d.target.x + 125 : d.target.x + 16; })
+				.attr("y2", function(d) { return d.target.center ? d.target.y + 32 : d.target.y + 16; });
+
+			node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+		  };
+
+		var node = svg.selectAll("g.person")
+			.data(json.nodes);
+
+				node.enter().append("svg:g")
+					.attr("transform", function(d){ return "translate(10,10)";})
+					.attr("class", "person")
+					.call(force.drag);
+		node.exit().remove();
+
+		svg.selectAll("g.person").each(function(d){ d.center ? doCenterNodeInsert(d3.select(this)) : doAuxNodeInsert(d3.select(this)); });
+
+		// Make sure links are at the beginning of the svg for layering purposes
+		var allLinksJq = $("svg").find("line.link");
+		allLinksJq.detach().prependTo($("svg"));
+
+		force.stop();
+		force.gravity(0.03);
+		force.start();
+		force.on("tick", tick);
+
+		$("#loading").hide();
+	};
+
+
+	var selectionBox = svg.selectAll("rect.selection-box")
+	.data([rectData])
+	.enter().append("svg:rect")
+	.attr("class", "selection-box")
+	.attr("x", function(d){ return d.startX;})
+	.attr("y", function(d){ return d.startY;})
+	.attr("height", function(d){return d.endX - d.startX;})
+	.attr("width", function(d){return d.endY - d.startY})
+	.style("fill", "#CCC")
+	.style("fill-opacity", 0.2)
+	.style("stroke", "#999")
+	.style("stroke-opacity", 0.5);
+
+	svg.on("mousedown", function(d){
+		isMouseDown = true;
+		var mouse = d3.mouse(this);
+		svg.selectAll("rect.selection-box").each(function(d2){
+			d2.startX = mouse[0];
+			d2.startY = mouse[1];
+			d2.endX = mouse[0];
+			d2.endY = mouse[1];
+
+			setupSelectionBoxAttributes(d3.select(this));
+		});
+	});
+
+	svg.on("mousemove", function(d){
+		if(isMouseDown){
+			var mouse = d3.mouse(this);
+			svg.selectAll("rect.selection-box").each(function(d2){
+				d2.endX = mouse[0];
+				d2.endY = mouse[1];
+
+				setupSelectionBoxAttributes(d3.select(this));
+			});
+		}
+	});
+
+	svg.on("mouseup", function(d){
+		isMouseDown = false;
+		var mouse = d3.mouse(this);
+		svg.selectAll("rect.selection-box").each(function(d2){
+			d2.endX = mouse[0];
+			d2.endY = mouse[1];
+
+			setupSelectionBoxAttributes(d3.select(this));
+
+			selectedPeople = rectData.calculateSelectedPeople(svg.selectAll("g.person"));
+
+			rectData.resetRectSelection();
+			setupSelectionBoxAttributes(d3.select(this));
+
+			$(".selection-modal").remove();
+			if( selectedPeople.length ) {
+
+				var $selectionModal = $('<div class="selection-modal"></div>');
+				$selectionModal.append('<div class="selection-modal-title">Selected</div><div class="selection-modal-selected"></div>');
+
+				_.each(selectedPeople,function(person){
+					$selectionModal.find(".selection-modal-selected").append('<div class="selection-modal-person clearfix"><img src="' + (person.picture || missingImage) + '" width="20" height="20"><span class="person-name">' + person.name +'</span></div>');
+				});
+
+				$selectionModal.append('<div class="selection-modal-actions"><input id=convo_title type="text" placeholder="New Conversation Title" /><input id=convo_message type="text" placeholder="Message" /><button type="button" class="start-convo">Start Conversation</button></div>');
+				$("body").append($selectionModal);
+			}
+
+		});
+	});
+
+	$(document).ready(function(){
+		$("#adjust_phyics").click(function(){
+			$("#sliders").toggle();
+		});
+	      $("#logout").click(function(){
+	            window.location = "/logout";
+	        });
+		
+		$("#force_linkdistance").change(function(){
+			force.linkDistance(this.value).stop().start();
+			$("#force_linkdistance_val").html(this.value);
+		});
+		$("#force_linkstrength").change(function(){
+			force.linkStrength(this.value).stop().start();
+			$("#force_linkstrength_val").html(this.value);
+		});
+		$("#force_friction").change(function(){
+			force.friction(this.value).stop().start();
+			$("#force_friction_val").html(this.value);
+		});
+		$("#force_charge").change(function(){
+			force.charge(this.value).stop().start();
+			$("#force_charge_val").html(this.value);
+		});
+		$("#force_theta").change(function(){
+			force.theta(this.value).stop().start();
+			$("#force_theta_val").html(this.value);
+		});
+		$("#force_gravity").change(function(){
+			force.gravity(this.value).stop().start();
+			$("#force_gravity_val").html(this.value);
+		});
+
+		$(".start-convo").live("click", function(){
+			if(selectedPeople.length > 0){
+				$("#loading").show();
+
+				var theUsers = _.pluck(selectedPeople, "eMailAddress");
+				$.post("/newconversation",
+						{ name : $("#convo_title").val(), message: $("#convo_message").val(),
+						users : theUsers },
+						function(data){
+							var url = "https://ontrackeap.oracle.com/ack/web/#conversation:id="
+								+ data.conversationId + "&m=NOT_SET";
+							window.open(url, "Conversation");
+							$("#loading").hide();
+						}, 'json');
+			}
+		});
+
+		// initially load currently logged in person's network
+		loadPerson();
+
+		$("#search_field")
+			.autocomplete({
+				source:function (request, callback) {
+					var format_data = function (matches) {
+						var formatted_matches = _.map(matches, function (u) {
+							return {label:u.name || u.login, value:u.login};
+						});
+
+						callback(formatted_matches);
+					}
+
+					Nodal.search(request.term, format_data);
+				},
+				select: function (evt, ui) {
+					loadPerson(ui.item.value);
+				}
+		}).click(function () { this.select(); });
+
+		$("#loading").hide();
+		$("#search_form").show();
+	});
+
+	function setupSelectionBoxAttributes(selectionBox){
+		selectionBox.attr("x", function(d){ return Math.min(rectData.startX,rectData.endX);})
+		.attr("y", function(d){ return Math.min(rectData.startY, rectData.endY);})
+		.attr("width", function(d){return Math.abs(rectData.endX - rectData.startX);})
+		.attr("height", function(d){return Math.abs(rectData.endY - rectData.startY)});
+	}
+
+	var getNextGroupFunction = function () {
+		var groupCounter = 1;
+		return function () { return groupCounter++; };
+	};
+	var getNextGroup = getNextGroupFunction();
+
+	var getAndMergeFollowers = function (id, callback) {
+
+		var groupToUse = getNextGroup();
+		HQ.getFollowers(id, function (followerData) {
+			var source = null, sourceNode = null,
+				i = 0;
+
+			// find index of the person to follow in the list of existing nodes
+			// so we can use it as the source when setting up the links
+			for (i = 0; i < force.nodes().length; ++i) {
+			if (force.nodes()[i].id === id || force.nodes()[i].login === id) {
+					sourceNode = force.nodes()[i];
+					source = i;
+					break;
+				}
+			}
+
+			_.each(followerData.items, function (person, idx) {
+				var target = idx, targetNode,
+					nodeExists = false, linkExists = false,
+					targetInfo = null;
+
+				targetInfo = doesNodeExist(person.id);
+				if (targetInfo) {
+					target = targetInfo.index;
+					targetNode = targetInfo.node;
+					nodeExists = true;
+				}
+
+				if (!nodeExists) {
+					person.name = person.displayName;
+					person.group = groupToUse;
+					person.picture = person.scaledPictureURL;
+
+					target = force.nodes().length;
+					targetNode = person;
+
+					force.nodes().push(person);
+
+
+					force.links().push({
+						source: source,
+						target: force.nodes().length - 1,
+						value: 1
+					});
+				} else {
+					linkExists = doesLinkExist(sourceNode, targetNode, force.links());
+
+					if (!linkExists) {
+						force.links().push({
+							source: source,
+							target: target,
+							value: 1
+						});
+					}
+				}
+			});
+
+			if (callback) callback();
+		});
+	};
+
+	var doesLinkExist = function (source, target, links) {
+		var links_length = links.length, i = 0,
+			link_node;
+		for (; i < links_length; ++i) {
+			link_node = links[i];
+			if ((source.id === link_node.source.id && target.id === link_node.target.id) ||
+				(target.id === link_node.source.id && source.id === link_node.target.id)) {
+				return true;
+			}
+		}
+		return false;
+	};
+
+	var doesNodeExist = function (id) {
+		var force_nodes = force.nodes(),
+			force_nodes_length = force_nodes.length,
+			i = 0;
+
+		for (; i < force_nodes_length; ++i) {
+			if (force_nodes[i].id == id) {
+				return {
+					node: force_nodes[i],
+					index: i
+				};
+			}
+		}
+
+		return null;
+	};
+
+	var loadPerson = function (initialPersonId) {
+		$("#loading").show();
+
+		if (doesNodeExist(initialPersonId)) {
+			getAndMergeFollowers(initialPersonId, function () {
+				redrawGraphsAndNodes();
+			});
+		} else {
+			HQ.getPerson(initialPersonId, function (initialPersonData) {
+				var initialPersonNode = initialPersonData,
+					nodes, i;
+
+				initialPersonNode.name = initialPersonData.displayName;
+				initialPersonNode.group = getNextGroup();
+				initialPersonNode.picture = initialPersonData.scaledPictureURL;
+
+				force.nodes().push(initialPersonNode);
+
+				getAndMergeFollowers(initialPersonData.login, function () {
+					redrawGraphsAndNodes();
+				});
+			});
+		}
+	};
+
+	function doCenterNodeInsert(d3Element){
+
+		d3Element
+		.attr("class", "person expanded");
+
+		d3Element
+			.append("svg:rect")
+			.attr("class","expanded-bg")
+			.attr("width", 300)
+			.attr("height", 85);
+
+		d3Element
+			.append("svg:g")
+			.attr("clip-path", "url(#centerAvatarClip)")
+			.attr("transform", "translate(8,8)")
+			.append("svg:image")
+			.attr("xlink:href", function(d){ return d.scaledPictureURL || missingImage;})
+			.attr("width", "48px")
+			.attr("height", "48px");
+
+		d3Element
+			.append("svg:text")
+			.attr("x", 64)
+			.attr("y", 28)
+			.style("font-size", 16)
+			.text(function(d){ return d.displayName;})
+			.on("click", function (d) {
+				var url = "https://ontrackeap.oracle.com/ack/web/#user:userId="
+					+ d.id + "&m=WALL";
+				window.open(url, "Profile");
+			});
+
+		d3Element
+			.append("svg:text")
+			.attr("x", 64)
+			.attr("y", 48)
+			.style("font-size", 11)
+			.text(function(d){ return d.eMailAddress;});
+
+		var showConnectionsBtn = d3Element
+			.append("svg:g")
+			.attr("transform","translate(64,56)")
+			.attr("class","show-connections")
+			.on("click", function (d) {
+				$("#loading").show();
+				getAndMergeFollowers(d.login, function () { redrawGraphsAndNodes(); });
+			});
+
+		showConnectionsBtn
+			.append("svg:rect")
+			.attr("class","show-connections-bg")
+			.attr("width",103)
+			.attr("height",20);
+
+		showConnectionsBtn
+			.append("svg:text")
+			.text("Show Connections")
+			.attr("x", 5)
+			.attr("y", 14);
+
+		d3Element
+			.append("svg:text")
+			.attr("class","close-expanded")
+			.text("x")
+			.attr("x", 285)
+			.attr("y", 18)
+			.on("click", function (d) {
+				d3.event.stopPropagation();
+
+				rectData.resetRectSelection();
+				setupSelectionBoxAttributes(svg.select("rect.selection-box"));
+
+				var panel = d3Element;
+
+				panel.selectAll("rect").remove();
+				panel.selectAll("text").remove();
+				panel.selectAll("g").remove();
+
+				d.center = false;
+				d.fixed = false;
+				doAuxNodeInsert(panel);
+
+				force.stop().start();
+			});
+	}
+
+	function doAuxNodeInsert(d3Element){
+
+		d3Element
+		.attr("clip-path", "url(#auxAvatarClip)")
+		.append("svg:image")
+		.attr("xlink:href", function(d){ return d.picture || missingImage;})
+		.attr("x", 0)
+		.attr("y", 0)
+		.attr("width", "40px")
+		.attr("height", "40px");
+		d3Element
+		.append("svg:circle")
+		.attr("class","aux-border")
+		.attr("cx", "20")
+		.attr("cy", "20")
+		.attr("r", 20);
+
+		d3Element.on("click", function(d){
+
+			rectData.resetRectSelection();
+			setupSelectionBoxAttributes(svg.select("rect.selection-box"));
+
+			var me = d3.select(this);
+			me.attr("clip-path", "");
+			me.selectAll("image").remove();
+
+			d.center = true;
+			d.fixed = true;
+			doCenterNodeInsert(me);
+			force.start();
+		});
+
+	}
+</script>
+</body>
+</html>

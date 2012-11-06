@@ -1,0 +1,7 @@
+venv
+nodal_venv
+*.pyc
+.project
+.pydevproject
+.settings
+.DS_Store
