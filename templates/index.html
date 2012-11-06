@@ -6,6 +6,7 @@
 
 	<link type="text/css" rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.24.custom.css"/>
 	<link type="text/css" rel="stylesheet" href="static/css/nodal.css"/>
+	<link type="text/css" rel="stylesheet" href="static/css/tipsy.css"/>
 
 </head>
 <body>
@@ -64,6 +65,7 @@
 <script src="static/js/jquery-ui-1.8.24.custom.min.js"></script>
 <script src="static/js/underscore-min.js"></script>
 <script src="static/js/nodal.js"></script>
+<script src="static/js/jquery.tipsy.js"></script>
 <script src="static/data-loader.js"></script>
 <script type="text/javascript">
 
@@ -338,6 +340,7 @@
 
 		$("#loading").hide();
 		$("#search_form").show();
+		
 	});
 
 	function setupSelectionBoxAttributes(selectionBox){
@@ -478,8 +481,10 @@
 		d3Element
 			.append("svg:rect")
 			.attr("class","expanded-bg")
-			.attr("width", 300)
-			.attr("height", 85);
+			.attr("width", 255)
+			.attr("height", 85)
+			.attr("rx",5)
+          	.attr("ry",5);
 
 		d3Element
 			.append("svg:g")
@@ -520,9 +525,11 @@
 
 		showConnectionsBtn
 			.append("svg:rect")
-			.attr("class","expanded-node-button-bg")
+			.attr("class","show-connections-bg")
 			.attr("width",103)
-			.attr("height",20);
+			.attr("height",20)
+			.attr("rx",3)
+          	.attr("ry",3);
 
 		showConnectionsBtn
 			.append("svg:text")
@@ -532,8 +539,8 @@
 
 		var openProfileBtn = d3Element
          .append("svg:g")
-         .attr("transform","translate(180,56)")
-         .attr("class","expanded-node-button")
+         .attr("transform","translate(175,56)")
+         .attr("class","show-connections")
          .on("click", function (d) {
         	 window.open('https://github.com/' + d.login, '_blank');
         	 window.focus();
@@ -541,9 +548,11 @@
 
 		openProfileBtn
           .append("svg:rect")
-          .attr("class","expanded-node-button-bg")
-          .attr("width",103)
-          .attr("height",20);
+          .attr("class","show-connections-bg")
+          .attr("width",70)
+          .attr("height",20)
+          .attr("rx",3)
+          .attr("ry",3);
 
 		openProfileBtn
           .append("svg:text")
@@ -555,7 +564,7 @@
 			.append("svg:text")
 			.attr("class","close-expanded")
 			.text("x")
-			.attr("x", 285)
+			.attr("x", 240)
 			.attr("y", 18)
 			.on("click", function (d) {
 				d3.event.stopPropagation();
@@ -579,23 +588,51 @@
 
 	function doAuxNodeInsert(d3Element){
 
-		d3Element
-		.attr("clip-path", "url(#auxAvatarClip)")
-		.append("svg:image")
-		.attr("xlink:href", function(d){ return d.picture || missingImage;})
-		.attr("x", 0)
-		.attr("y", 0)
-		.attr("width", "40px")
-		.attr("height", "40px");
-		d3Element
-		.append("svg:circle")
-		.attr("class","aux-border")
-		.attr("cx", "20")
-		.attr("cy", "20")
-		.attr("r", 20);
+		// set up circle portrait with clipping just to the pic
+		var circle_portrait = d3Element.append("g").attr("class","circle-portrait");
+
+		circle_portrait
+			.attr("clip-path", "url(#auxAvatarClip)")
+			.append("svg:image")
+			.attr("xlink:href", function(d){ return d.picture || missingImage;})
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", "40px")
+			.attr("height", "40px");
+		
+		circle_portrait
+			.append("svg:circle")
+			.attr("class","aux-border")
+			.attr("cx", "20")
+			.attr("cy", "20")
+			.attr("r", 20);
+
+		// set up name hover
+		var name_hover = d3Element
+			.append("svg:g")
+			.attr("class","name-hover")
+			.attr("transform","translate(42,-12)")
+			.attr("opacity",0);
+		
+		name_hover
+			.append("svg:rect")
+			.attr("rx",5)
+			.attr("ry",5)
+			.attr("width",100)
+			.attr("height",24);
+		
+		name_hover
+			.append("svg:text")
+			.attr("transform","translate(10,16)")
+			.text(function(d){ return d.name; });
+
+		d3Element.on("mouseover", function(d){
+			name_hover.attr("opacity",1);
+		}).on("mouseout",function(d){
+			name_hover.attr("opacity",0);
+		});
 
 		d3Element.on("click", function(d){
-
 			rectData.resetRectSelection();
 			setupSelectionBoxAttributes(svg.select("rect.selection-box"));
 

@@ -119,11 +119,16 @@ line.link {
   stroke: #999;
   stroke-opacity: .6;
 }
+g.name-hover rect {
+	fill: #000;
+	opacity: 0.7;
+}
+g.name-hover text {
+	fill: #FFF;
+	font-size: 12px;
+}
 g.expanded rect.expanded-bg {
 	fill: #EEEEE8;
-	stroke: #E8E8DE;
-	stroke-width: 4px;
-	stroke-opacity: .8;
 }
 g.expanded text {
 	fill: #333;
@@ -145,11 +150,14 @@ g.show-connections:hover {
 	cursor: pointer;
 }
 g.show-connections rect.show-connections-bg {
-	fill: #cf0404;
+	fill: #D8D8C8;
 }
 g.show-connections text {
-	fill: #FFF;
+	fill: #555;
 	font-size: 11px;
+}
+g.show-connections text:hover {
+	fill: #000;
 }
 circle.aux-border {
 	fill-opacity: 0;
