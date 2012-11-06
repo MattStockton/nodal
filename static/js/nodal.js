@@ -138,4 +138,5 @@
 	Nodal.search = GitHubNodal.search;
 	Nodal.follow_users = GitHubNodal.follow_users;
 	Nodal.add_stats_listener = function (callback) { GitHubNodal.Util.add_listener("Stats", callback); };
+	Nodal.has_access_token = GitHubNodal.get_access_token;
 })();

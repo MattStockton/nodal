@@ -251,7 +251,7 @@
 			setupSelectionBoxAttributes(d3.select(this));
 
 			$(".selection-modal").remove();
-			if( selectedPeople.length ) {
+			if( selectedPeople.length && Nodal.has_access_token()) {
 
 				var $selectionModal = $('<div class="selection-modal"></div>');
 				$selectionModal.append('<div class="selection-modal-title">Selected</div><div class="selection-modal-selected"></div>');
@@ -343,7 +343,7 @@
 
 		$("#loading").hide();
 		$("#search_form").show();
-		
+
 		Nodal.add_stats_listener(function (data) {
 			$("#api_limit_info").html(data.API_RateLimit_Remaining + "/" + data.API_RateLimit_Limit);
 		});
@@ -510,12 +510,7 @@
 			.attr("x", 64)
 			.attr("y", 28)
 			.style("font-size", 16)
-			.text(function(d){ return d.displayName;})
-			.on("click", function (d) {
-				var url = "https://ontrackeap.oracle.com/ack/web/#user:userId="
-					+ d.id + "&m=WALL";
-				window.open(url, "Profile");
-			});
+			.text(function(d){ return d.displayName;});
 
 		d3Element
 			.append("svg:text")
@@ -613,7 +608,7 @@
 			.attr("y", 0)
 			.attr("width", "40px")
 			.attr("height", "40px");
-		
+
 		circle_portrait
 			.append("svg:circle")
 			.attr("class","aux-border")
@@ -627,14 +622,14 @@
 			.attr("class","name-hover")
 			.attr("transform","translate(42,-12)")
 			.attr("opacity",0);
-		
+
 		name_hover
 			.append("svg:rect")
 			.attr("rx",5)
 			.attr("ry",5)
 			.attr("width",100)
 			.attr("height",24);
-		
+
 		name_hover
 			.append("svg:text")
 			.attr("transform","translate(10,16)")
