@@ -486,7 +486,7 @@
 	function doCenterNodeInsert(d3Element){
 
 		d3Element
-		.attr("class", "person expanded");
+			.attr("class", "person expanded");
 
 		d3Element
 			.append("svg:rect")
@@ -594,10 +594,14 @@
 
 				force.stop().start();
 			});
+
+		d3Element.selectAll("g.name-hover").remove();
 	}
 
 	function doAuxNodeInsert(d3Element){
 
+		d3Element.attr("class","person");
+		
 		// set up circle portrait with clipping just to the pic
 		var circle_portrait = d3Element.append("g").attr("class","circle-portrait");
 
@@ -636,7 +640,7 @@
 			.attr("transform","translate(10,16)")
 			.text(function(d){ return d.name; });
 
-		d3Element.on("mouseover", function(d){
+		circle_portrait.on("mouseover", function(d){
 			name_hover.attr("opacity",1);
 		}).on("mouseout",function(d){
 			name_hover.attr("opacity",0);
