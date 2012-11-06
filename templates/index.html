@@ -494,176 +494,146 @@
 		}
 	};
 
-	function doCenterNodeInsert(d3Element){
+    function doCenterNodeInsert(d3Element){
 
-		d3Element
-			.attr("class", "person expanded");
+        d3Element
+        .attr("class", "person expanded");
 
-		d3Element
-			.append("svg:rect")
-			.attr("class","expanded-bg")
-			.attr("width", 255)
-			.attr("height", 85)
-			.attr("rx",5)
-          	.attr("ry",5);
+        d3Element
+            .append("svg:rect")
+            .attr("class","expanded-bg")
+            .attr("width", 300)
+            .attr("height", 85);
 
-		d3Element
-			.append("svg:g")
-			.attr("clip-path", "url(#centerAvatarClip)")
-			.attr("transform", "translate(8,8)")
-			.append("svg:image")
-			.attr("xlink:href", function(d){ return d.scaledPictureURL || missingImage;})
-			.attr("width", "48px")
-			.attr("height", "48px");
+        d3Element
+            .append("svg:g")
+            .attr("clip-path", "url(#centerAvatarClip)")
+            .attr("transform", "translate(8,8)")
+            .append("svg:image")
+            .attr("xlink:href", function(d){ return d.scaledPictureURL || missingImage;})
+            .attr("width", "48px")
+            .attr("height", "48px");
 
-		d3Element
-			.append("svg:text")
-			.attr("x", 64)
-			.attr("y", 28)
-			.style("font-size", 16)
-			.text(function(d){ return d.displayName;});
+        d3Element
+            .append("svg:text")
+            .attr("x", 64)
+            .attr("y", 28)
+            .style("font-size", 16)
+            .text(function(d){ return d.displayName;})
+            .on("click", function (d) {
+                var url = "https://ontrackeap.oracle.com/ack/web/#user:userId="
+                    + d.id + "&m=WALL";
+                window.open(url, "Profile");
+            });
 
-		d3Element
-			.append("svg:text")
-			.attr("x", 64)
-			.attr("y", 48)
-			.style("font-size", 11)
-			.text(function(d){ return d.eMailAddress;});
+        d3Element
+            .append("svg:text")
+            .attr("x", 64)
+            .attr("y", 48)
+            .style("font-size", 11)
+            .text(function(d){ return d.eMailAddress;});
 
-		var showConnectionsBtn = d3Element
-			.append("svg:g")
-			.attr("transform","translate(64,56)")
-			.attr("class","show-connections")
-			.on("click", function (d) {
-				$("#loading").show();
-				getAndMergeFollowers(d.login, function () { redrawGraphsAndNodes(); });
-			});
+        var showConnectionsBtn = d3Element
+            .append("svg:g")
+            .attr("transform","translate(64,56)")
+            .attr("class","show-connections")
+            .on("click", function (d) {
+                $("#loading").show();
+                getAndMergeFollowers(d.login, function () { redrawGraphsAndNodes(); });
+            });
 
-		showConnectionsBtn
-			.append("svg:rect")
-			.attr("class","show-connections-bg")
-			.attr("width",103)
-			.attr("height",20)
-			.attr("rx",3)
-          	.attr("ry",3);
+        showConnectionsBtn
+            .append("svg:rect")
+            .attr("class","expanded-node-button-bg")
+            .attr("width",103)
+            .attr("height",20);
 
-		showConnectionsBtn
-			.append("svg:text")
-			.text("Show Connections")
-			.attr("x", 5)
-			.attr("y", 14);
+        showConnectionsBtn
+            .append("svg:text")
+            .text("Show Connections")
+            .attr("x", 5)
+            .attr("y", 14);
 
-		var openProfileBtn = d3Element
+        var openProfileBtn = d3Element
          .append("svg:g")
-         .attr("transform","translate(175,56)")
-         .attr("class","show-connections")
+         .attr("transform","translate(180,56)")
+         .attr("class","expanded-node-button")
          .on("click", function (d) {
-        	 window.open('https://github.com/' + d.login, '_blank');
-        	 window.focus();
+             window.open('https://github.com/' + d.login, '_blank');
+             window.focus();
          });
 
-		openProfileBtn
+        openProfileBtn
           .append("svg:rect")
-          .attr("class","show-connections-bg")
-          .attr("width",70)
-          .attr("height",20)
-          .attr("rx",3)
-          .attr("ry",3);
+          .attr("class","expanded-node-button-bg")
+          .attr("width",103)
+          .attr("height",20);
 
-		openProfileBtn
+        openProfileBtn
           .append("svg:text")
           .text("Open Profile")
           .attr("x", 5)
           .attr("y", 14);
+        
+        d3Element
+            .append("svg:text")
+            .attr("class","close-expanded")
+            .text("x")
+            .attr("x", 285)
+            .attr("y", 18)
+            .on("click", function (d) {
+                d3.event.stopPropagation();
 
-		d3Element
-			.append("svg:text")
-			.attr("class","close-expanded")
-			.text("x")
-			.attr("x", 240)
-			.attr("y", 18)
-			.on("click", function (d) {
-				d3.event.stopPropagation();
+                rectData.resetRectSelection();
+                setupSelectionBoxAttributes(svg.select("rect.selection-box"));
 
-				rectData.resetRectSelection();
-				setupSelectionBoxAttributes(svg.select("rect.selection-box"));
+                var panel = d3Element;
 
-				var panel = d3Element;
+                panel.selectAll("rect").remove();
+                panel.selectAll("text").remove();
+                panel.selectAll("g").remove();
 
-				panel.selectAll("rect").remove();
-				panel.selectAll("text").remove();
-				panel.selectAll("g").remove();
+                d.center = false;
+                d.fixed = false;
+                doAuxNodeInsert(panel);
 
-				d.center = false;
-				d.fixed = false;
-				doAuxNodeInsert(panel);
+                force.stop().start();
+            });
+    }
 
-				force.stop().start();
-			});
-	}
+    function doAuxNodeInsert(d3Element){
 
-	function doAuxNodeInsert(d3Element){
+        d3Element
+        .attr("clip-path", "url(#auxAvatarClip)")
+        .append("svg:image")
+        .attr("xlink:href", function(d){ return d.picture || missingImage;})
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", "40px")
+        .attr("height", "40px");
+        d3Element
+        .append("svg:circle")
+        .attr("class","aux-border")
+        .attr("cx", "20")
+        .attr("cy", "20")
+        .attr("r", 20);
 
-		d3Element.attr("class","person");
-		
-		// set up circle portrait with clipping just to the pic
-		var circle_portrait = d3Element.append("g").attr("class","circle-portrait");
+        d3Element.on("click", function(d){
 
-		circle_portrait
-			.attr("clip-path", "url(#auxAvatarClip)")
-			.append("svg:image")
-			.attr("xlink:href", function(d){ return d.picture || missingImage;})
-			.attr("x", 0)
-			.attr("y", 0)
-			.attr("width", "40px")
-			.attr("height", "40px");
+            rectData.resetRectSelection();
+            setupSelectionBoxAttributes(svg.select("rect.selection-box"));
 
-		circle_portrait
-			.append("svg:circle")
-			.attr("class","aux-border")
-			.attr("cx", "20")
-			.attr("cy", "20")
-			.attr("r", 20);
+            var me = d3.select(this);
+            me.attr("clip-path", "");
+            me.selectAll("image").remove();
 
-		// set up name hover
-		var name_hover = d3Element
-			.append("svg:g")
-			.attr("class","name-hover")
-			.attr("transform","translate(42,-12)");
+            d.center = true;
+            d.fixed = true;
+            doCenterNodeInsert(me);
+            force.start();
+        });
 
-		name_hover
-			.append("svg:rect")
-			.attr("rx",5)
-			.attr("ry",5)
-			.attr("width",100)
-			.attr("height",24);
-
-		name_hover
-			.append("svg:text")
-			.attr("transform","translate(10,16)")
-			.text(function(d){ return d.name; });
-
-		circle_portrait.on("mouseover", function(d){
-			name_hover.attr("style","display:block");
-		}).on("mouseout",function(d){
-			name_hover.attr("style","display:none");
-		}).on("click", function(d){
-			rectData.resetRectSelection();
-			setupSelectionBoxAttributes(svg.select("rect.selection-box"));
-
-			d3Element.selectAll("g.name-hover").remove();
-			
-			var me = d3.select(this);
-			me.attr("clip-path", "");
-			me.selectAll("image").remove();
-
-			d.center = true;
-			d.fixed = true;
-			doCenterNodeInsert(me);
-			force.start();
-		});
-
-	}
+    }
 </script>
 </body>
 </html>
