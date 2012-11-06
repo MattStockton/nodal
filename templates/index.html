@@ -51,6 +51,7 @@
 		<div id="header_buttons">
 			<button id="adjust_phyics" type="button" class="btn">Adjust Physics</button>
 			<button id="logout" type="button" class="btn">Logout</button>
+			<span id=api_limit_info></span>
 		</div>
 		<div id="search_form">
 			<input id="search_field" placeholder="Search for a name..."/>
@@ -66,7 +67,6 @@
 <script src="static/js/underscore-min.js"></script>
 <script src="static/js/nodal.js"></script>
 <script src="static/js/jquery.tipsy.js"></script>
-<script src="static/data-loader.js"></script>
 <script type="text/javascript">
 
     var github_access_token = "{{access_token}}";
@@ -260,7 +260,7 @@
 					$selectionModal.find(".selection-modal-selected").append('<div class="selection-modal-person clearfix"><img src="' + (person.picture || missingImage) + '" width="20" height="20"><span class="person-name">' + person.name +'</span></div>');
 				});
 
-				$selectionModal.append('<div class="selection-modal-actions"><input id=convo_title type="text" placeholder="New Conversation Title" /><input id=convo_message type="text" placeholder="Message" /><button type="button" class="start-convo">Start Conversation</button></div>');
+				$selectionModal.append('<div class="selection-modal-actions"><button type="button" class="js-github-follow github-follow">Follow on GitHub</button></div>');
 				$("body").append($selectionModal);
 			}
 
@@ -274,7 +274,7 @@
 	      $("#logout").click(function(){
 	            window.location = "/logout";
 	        });
-		
+
 		$("#force_linkdistance").change(function(){
 			force.linkDistance(this.value).stop().start();
 			$("#force_linkdistance_val").html(this.value);
@@ -300,20 +300,23 @@
 			$("#force_gravity_val").html(this.value);
 		});
 
-		$(".start-convo").live("click", function(){
+		$(".js-github-follow").live("click", function(){
 			if(selectedPeople.length > 0){
 				$("#loading").show();
 
-				var theUsers = _.pluck(selectedPeople, "eMailAddress");
-				$.post("/newconversation",
-						{ name : $("#convo_title").val(), message: $("#convo_message").val(),
-						users : theUsers },
-						function(data){
-							var url = "https://ontrackeap.oracle.com/ack/web/#conversation:id="
-								+ data.conversationId + "&m=NOT_SET";
-							window.open(url, "Conversation");
-							$("#loading").hide();
-						}, 'json');
+				var logins = _.pluck(selectedPeople, "login");
+
+				var done_callback = function(success){
+					if(success){
+					   $("#loading").hide();
+		               $(".selection-modal").remove();
+		               alert("Follow Success!") // TODO KG Style this
+					} else {
+					   alert("Follow Failure!") // TODO KG Style this
+					}
+
+				};
+				Nodal.follow_users(logins, done_callback);
 			}
 		});
 
@@ -341,6 +344,9 @@
 		$("#loading").hide();
 		$("#search_form").show();
 		
+		Nodal.add_stats_listener(function (data) {
+			$("#api_limit_info").html(data.API_RateLimit_Remaining + "/" + data.API_RateLimit_Limit);
+		});
 	});
 
 	function setupSelectionBoxAttributes(selectionBox){
@@ -359,7 +365,8 @@
 	var getAndMergeFollowers = function (id, callback) {
 
 		var groupToUse = getNextGroup();
-		HQ.getFollowers(id, function (followerData) {
+		Nodal.get_social_network(id, function (network) {
+			var followerData = {items:network};
 			var source = null, sourceNode = null,
 				i = 0;
 
@@ -456,13 +463,16 @@
 				redrawGraphsAndNodes();
 			});
 		} else {
-			HQ.getPerson(initialPersonId, function (initialPersonData) {
+			Nodal.get_user_detail(initialPersonId, function (initialPersonData) {
 				var initialPersonNode = initialPersonData,
 					nodes, i;
 
 				initialPersonNode.name = initialPersonData.displayName;
 				initialPersonNode.group = getNextGroup();
 				initialPersonNode.picture = initialPersonData.scaledPictureURL;
+				initialPersonData.x = window.innerWidth / 2;
+				initialPersonData.y = window.innerHeight / 2;
+				initialPersonData.fixed = true;
 
 				force.nodes().push(initialPersonNode);
 
@@ -559,7 +569,7 @@
           .text("Open Profile")
           .attr("x", 5)
           .attr("y", 14);
-		
+
 		d3Element
 			.append("svg:text")
 			.attr("class","close-expanded")
