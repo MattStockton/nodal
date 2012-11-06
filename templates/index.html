@@ -251,7 +251,7 @@
 			setupSelectionBoxAttributes(d3.select(this));
 
 			$(".selection-modal").remove();
-			if( selectedPeople.length ) {
+			if( selectedPeople.length && Nodal.has_access_token()) {
 
 				var $selectionModal = $('<div class="selection-modal"></div>');
 				$selectionModal.append('<div class="selection-modal-title">Selected</div><div class="selection-modal-selected"></div>');
