@@ -50,6 +50,7 @@
 		<div id="header_buttons">
 			<button id="adjust_phyics" type="button" class="btn">Adjust Physics</button>
 			<button id="logout" type="button" class="btn">Logout</button>
+			<span id=api_limit_info></span>
 		</div>
 		<div id="search_form">
 			<input id="search_field" placeholder="Search for a name..."/>
@@ -272,7 +273,7 @@
 	      $("#logout").click(function(){
 	            window.location = "/logout";
 	        });
-		
+
 		$("#force_linkdistance").change(function(){
 			force.linkDistance(this.value).stop().start();
 			$("#force_linkdistance_val").html(this.value);
@@ -338,6 +339,10 @@
 
 		$("#loading").hide();
 		$("#search_form").show();
+
+		Nodal.add_stats_listener(function (data) {
+			$("#api_limit_info").html(data.API_RateLimit_Remaining + "/" + data.API_RateLimit_Limit);
+		});
 	});
 
 	function setupSelectionBoxAttributes(selectionBox){
