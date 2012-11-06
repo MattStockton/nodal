@@ -103,9 +103,13 @@
 				);
 			});
 			
-			$.when(follow_requests).done(function(){
+			$.when(follow_requests).then(function(){
 				if(callback){
-					callback();
+					callback(true);
+				}
+			}, function(){
+				if(callback){
+					callback(false);
 				}
 			});
 		}

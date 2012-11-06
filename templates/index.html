@@ -65,7 +65,6 @@
 <script src="static/js/jquery-ui-1.8.24.custom.min.js"></script>
 <script src="static/js/underscore-min.js"></script>
 <script src="static/js/nodal.js"></script>
-<script src="static/data-loader.js"></script>
 <script type="text/javascript">
 
     var github_access_token = "{{access_token}}";
@@ -305,8 +304,15 @@
 
 				var logins = _.pluck(selectedPeople, "login");
 
-				var done_callback = function(){
-					$("#loading").hide();
+				var done_callback = function(success){
+					if(success){
+					   $("#loading").hide();
+		               $(".selection-modal").remove();
+		               alert("Follow Success!") // TODO KG Style this
+					} else {
+					   alert("Follow Failure!") // TODO KG Style this
+					}
+
 				};
 				Nodal.follow_users(logins, done_callback);
 			}
