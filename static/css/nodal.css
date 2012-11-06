@@ -141,13 +141,13 @@ input[type=range] {
 	
 }
 
-g.show-connections:hover {
+g.expanded-node-button:hover {
 	cursor: pointer;
 }
-g.show-connections rect.show-connections-bg {
+g.expanded-node-button rect.expanded-node-button-bg {
 	fill: #cf0404;
 }
-g.show-connections text {
+g.expanded-node-button text {
 	fill: #FFF;
 	font-size: 11px;
 }
@@ -157,9 +157,6 @@ circle.aux-border {
 	stroke: #FFF;
 	stroke-width: 5;
 }
-
-
-
 
 
 .selection-modal {
