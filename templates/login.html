@@ -32,7 +32,7 @@
 <script>
 $(document).ready(function(){
 	$(".js-github-login").on("click",function(){
-		window.location = "https://github.com/login/oauth/authorize?client_id=" + "{{ client_id }}"
+		window.location = "https://github.com/login/oauth/authorize?scope=user&client_id=" + "{{ client_id }}"
 	});
 });
 

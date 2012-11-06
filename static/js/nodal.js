@@ -50,7 +50,28 @@
 			$.get(GitHubNodal.api_url("user", handler, "json"), handler, "json");
 		}
 	};
-
+	
+	GitHubNodal.follow_users = function(usernames, callback) {
+		if(usernames.length > 0){
+			var follow_requests = [];
+			
+			_.each(usernames, function(username){
+				follow_requests.push(
+					$.ajax({
+						type: "PUT",
+						url: GitHubNodal.api_url("user/following/" + username)
+					})
+				);
+			});
+			
+			$.when(follow_requests).done(function(){
+				if(callback){
+					callback();
+				}
+			});
+		}
+	};
+	
 	GitHubNodal.adjust_user_detail = function (user) {
 		user.name = user.login;
 		user.displayName = user.login;
@@ -59,7 +80,7 @@
 
 	GitHubNodal.get_access_token = function () {
 		return github_access_token;
-	}
+	};
 
 	GitHubNodal.api_url = function (endpoint) {
 		return GitHubNodal.API_BASE_URL + endpoint + "?access_token=" + GitHubNodal.get_access_token();
@@ -88,4 +109,5 @@
 	Nodal.get_social_network = GitHubNodal.get_social_network;
 	Nodal.get_user_detail = GitHubNodal.get_user_detail;
 	Nodal.search = GitHubNodal.search;
+	Nodal.follow_users = GitHubNodal.follow_users;
 })();

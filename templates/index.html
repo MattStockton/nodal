@@ -258,7 +258,7 @@
 					$selectionModal.find(".selection-modal-selected").append('<div class="selection-modal-person clearfix"><img src="' + (person.picture || missingImage) + '" width="20" height="20"><span class="person-name">' + person.name +'</span></div>');
 				});
 
-				$selectionModal.append('<div class="selection-modal-actions"><input id=convo_title type="text" placeholder="New Conversation Title" /><input id=convo_message type="text" placeholder="Message" /><button type="button" class="start-convo">Start Conversation</button></div>');
+				$selectionModal.append('<div class="selection-modal-actions"><button type="button" class="js-github-follow github-follow">Follow on GitHub</button></div>');
 				$("body").append($selectionModal);
 			}
 
@@ -298,20 +298,16 @@
 			$("#force_gravity_val").html(this.value);
 		});
 
-		$(".start-convo").live("click", function(){
+		$(".js-github-follow").live("click", function(){
 			if(selectedPeople.length > 0){
 				$("#loading").show();
 
-				var theUsers = _.pluck(selectedPeople, "eMailAddress");
-				$.post("/newconversation",
-						{ name : $("#convo_title").val(), message: $("#convo_message").val(),
-						users : theUsers },
-						function(data){
-							var url = "https://ontrackeap.oracle.com/ack/web/#conversation:id="
-								+ data.conversationId + "&m=NOT_SET";
-							window.open(url, "Conversation");
-							$("#loading").hide();
-						}, 'json');
+				var logins = _.pluck(selectedPeople, "login");
+				
+				var done_callback = function(){
+					$("#loading").hide();
+				};
+				Nodal.follow_users(logins, done_callback);
 			}
 		});
 
