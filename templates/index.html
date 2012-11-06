@@ -520,7 +520,7 @@
 
 		showConnectionsBtn
 			.append("svg:rect")
-			.attr("class","show-connections-bg")
+			.attr("class","expanded-node-button-bg")
 			.attr("width",103)
 			.attr("height",20);
 
@@ -530,6 +530,27 @@
 			.attr("x", 5)
 			.attr("y", 14);
 
+		var openProfileBtn = d3Element
+         .append("svg:g")
+         .attr("transform","translate(180,56)")
+         .attr("class","expanded-node-button")
+         .on("click", function (d) {
+        	 window.open('https://github.com/' + d.login, '_blank');
+        	 window.focus();
+         });
+
+		openProfileBtn
+          .append("svg:rect")
+          .attr("class","expanded-node-button-bg")
+          .attr("width",103)
+          .attr("height",20);
+
+		openProfileBtn
+          .append("svg:text")
+          .text("Open Profile")
+          .attr("x", 5)
+          .attr("y", 14);
+		
 		d3Element
 			.append("svg:text")
 			.attr("class","close-expanded")
