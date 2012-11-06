@@ -26,11 +26,16 @@
 			},
 
 			get: function (url, callback) {
-				$.get(url, url, GitHubNodal.Util.catch_api_call(callback), "json");
+				return $.get(url, url, GitHubNodal.Util.catch_api_call(callback), "json");
 			},
 
-			post: function (url, data, callback) {
-				$.post(url, data, GitHubNodal.Util.catch_api_call(callback), "json");
+			put: function (url, callback) {
+				return $.ajax({
+					type: 'PUT',
+					url: url,
+					success: GitHubNodal.Util.catch_api_call(callback),
+					dataType: "json"
+				});
 			},
 
 			add_listener: function (component, callback) {
@@ -47,33 +52,14 @@
 	};
 
 	GitHubNodal.get_social_network = function (username, callback) {
-		var social_network = [];
-		var handle_followers = function (data, text_status, jqXHR) {
-			log("Follower count: " + data.length);
-			_.each(data, function (follower) {
-				GitHubNodal.adjust_user_detail(follower);
-				follower["relationship"] = ["follower"];
-				social_network.push(follower);
-			});
-			GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username + "/following"), handle_following);
-		};
-		var handle_following = function (data, text_status, jqXHR) {
-			log("Following count: " + data.length);
-			_.each(data, function (following) {
-				var existing_relationship = _.find(social_network, function (r) { return r.id === following.id; });
-				if (existing_relationship) {
-					existing_relationship["relationship"].push("following");
-				} else {
-					GitHubNodal.adjust_user_detail(following);
-					following["relationship"] = "following";
-					social_network.push(following);
-				}
-			});
-
-			if (callback) callback(social_network);
-		};
-
-		GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username + "/followers"), handle_followers);
+		$.when(
+			GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username + "/following")),
+			GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username + "/followers"))
+		).done(function (following, followers) {
+			var social_network = _.union(following[0], followers[0]);
+			_.each(social_network, GitHubNodal.adjust_user_detail);
+			callback(social_network);
+		});
 	};
 
 	GitHubNodal.get_user_detail = function (username, callback) {
@@ -89,21 +75,16 @@
 			GitHubNodal.Util.get(GitHubNodal.api_url("user", handler, "json"), handler);
 		}
 	};
-	
+
 	GitHubNodal.follow_users = function(usernames, callback) {
 		if(usernames.length > 0){
 			var follow_requests = [];
-			
+
 			_.each(usernames, function(username){
-				follow_requests.push(
-					$.ajax({
-						type: "PUT",
-						url: GitHubNodal.api_url("user/following/" + username)
-					})
-				);
+				follow_requests.push(GitHubNodal.Util.put(GitHubNodal.api_url("user/following/" + username)));
 			});
-			
-			$.when(follow_requests).then(function(){
+
+			$.when(follow_requests).done(function(){
 				if(callback){
 					callback(true);
 				}
@@ -114,7 +95,7 @@
 			});
 		}
 	};
-	
+
 	GitHubNodal.adjust_user_detail = function (user) {
 		user.name = user.login;
 		user.displayName = user.login;
