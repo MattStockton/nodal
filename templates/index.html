@@ -589,8 +589,6 @@
 
 				force.stop().start();
 			});
-
-		d3Element.selectAll("g.name-hover").remove();
 	}
 
 	function doAuxNodeInsert(d3Element){
@@ -620,8 +618,7 @@
 		var name_hover = d3Element
 			.append("svg:g")
 			.attr("class","name-hover")
-			.attr("transform","translate(42,-12)")
-			.attr("opacity",0);
+			.attr("transform","translate(42,-12)");
 
 		name_hover
 			.append("svg:rect")
@@ -636,15 +633,15 @@
 			.text(function(d){ return d.name; });
 
 		circle_portrait.on("mouseover", function(d){
-			name_hover.attr("opacity",1);
+			name_hover.attr("style","display:block");
 		}).on("mouseout",function(d){
-			name_hover.attr("opacity",0);
-		});
-
-		d3Element.on("click", function(d){
+			name_hover.attr("style","display:none");
+		}).on("click", function(d){
 			rectData.resetRectSelection();
 			setupSelectionBoxAttributes(svg.select("rect.selection-box"));
 
+			d3Element.selectAll("g.name-hover").remove();
+			
 			var me = d3.select(this);
 			me.attr("clip-path", "");
 			me.selectAll("image").remove();
