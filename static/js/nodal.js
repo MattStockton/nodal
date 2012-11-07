@@ -51,34 +51,40 @@
 		}
 	};
 
-	GitHubNodal.get_social_network = function (user, callback) {
-		var has_user_data = _.isObject(user);
-		var username = has_user_data ? user.login : user;
+	GitHubNodal.get_social_network = function (user, callback, next_link) {
 		var page_size = 100;
+		var connections_loaded = 0;
+		var social_network = [];
 
-		var requests = [], social_network = [];
-		var merge_networks = function (network) {
-			_.each(network, function (user) {
-				if (!_.find(social_network, function (u) { return u.id === user.id; })) {
-					GitHubNodal.adjust_user_detail(user);
-					social_network.push(user);
+		var new_next_link = null;
+		var intercept_new_next_link = function (data, text_status, jqXHR) {
+			var link = jqXHR.getResponseHeader("Link");
+			var m = /<([^>]+)>; rel="next"/.exec(link);
+			if (m) new_next_link = m[1];
+		}
+
+		var rel = "followers";
+		var params = ["per_page=" + page_size];
+		var url = next_link || GitHubNodal.api_url("users/" + user.login + "/" + rel, params);
+
+		$.when(
+			GitHubNodal.Util.get(url, intercept_new_next_link)
+		).done(function (network) {
+			var network_length = network.length, network_index = 0, connection,
+				sn_start_index = social_network.length, sn_end_index;
+			for (; network_index < network_length; ++network_index) {
+				connection = network[network_index];
+				if (!_.find(social_network, function (u) { return u.id === connection.id; })) {
+					GitHubNodal.adjust_user_detail(connection);
+					social_network.push(connection);
 				}
+			}
+			sn_end_index = social_network.length - 1;
+
+			log("Loaded " + connections_loaded + " connections for " + user.login + " " + social_network[sn_start_index].id + "..." + social_network[sn_end_index].id);
+			callback(social_network, function (_user, _callback) {
+				return GitHubNodal.get_social_network(user, _callback, new_next_link);
 			});
-		};
-
-		_.each(["followers", "following"], function (rel) {
-			var count = has_user_data && user[rel] ? user[rel] : 0;
-			var required_page_count = Math.floor(count / page_size) + 1;
-
-			_.times(required_page_count, function (page) {
-				var params = ["page=" + page, "per_page=" + page_size];
-				var url = GitHubNodal.api_url("users/" + username + "/" + rel, params);
-				requests.push(GitHubNodal.Util.get(url, merge_networks));
-			});
-		});
-
-		$.when.apply(this, requests).done(function () {
-			callback(social_network);
 		});
 	};
 

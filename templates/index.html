@@ -86,6 +86,9 @@
 
 	var missingImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAEBUlEQVRYw4VYCXIjIQzk//9b7xDHThwfycaxA7xg5TmgpRbjqikXwwASrdblkHJJOben6NflyTLfPpXHQyvzMjMN6qusnMfLb64z47IwvhTcgNtwaUapeChpvyy2x+YqHg8XJcwRWd8PVcmk2bKLt+ir0/kGs2DwQU0TqGyUM0j0RCIGsxErzCBxQqJ0YPdM4J2iedO+tmXGBI1bj0EAxpVsjVIQ6gz8sqYp2vz1EyCa9RoiZvEkgYHNAou2EeCRabqMgaRuCS4fXSqp22urGdq6CukHmDtygq1ejC8lLbvezMLuBQ9jF2u15h3aFo4rk0cgPxIaSHGFrExhA71DBTXHIfWdyB2AyPYQdHXLpPoatI6aNRTaPO/XIBMZkbkERslkjqLjHRu49CDR3NS3Ii3Zy4KziJyWSfOb0sfpNGy3mxj/DIM8Mj6ezzLf1CoueY0RC+QOT16FywSx75+fl91ukj09iypR5q+3G8PmntM4Uc3jfPboKXfd7vcib5IKg1mhl92+4pFN9NTaVN4EmxWRQZ5TCeYgMiIe9ZE13QDabFSUEuBCmpuU1eT378uLKxh0imIdThCcjKo2wc1GbhUjr/+uVxRZqUB6DLJSG7QkLk0wYq6ERQPm6XJZsQJQZDh/fjruRtFoeg0m/SRVltl0NRIC3WFwX+URB+aKhGIx1hPsCJ7iSbFykRrjAkA03DTlmUnlKCUkTwkuUKfNcj+Q7dpinj/OSLScnKgMqJMhexWKm/qAmJEixEjSWKk6EpNCk/I7TGCJXACysA29t/t9Ey3yGweV4fb765c2Tk6o5si+jgY3GcTX1/U4ITrJGq5ceq1Dq7aJGZY71Uzn2UuHftCM4skrhR03V8EWov1CqG6W7NAH45E73NizMhMM5tlN6xrGe0odB3k8kr2ek10DE7hgMRkVq0Uh5vnyuXt/Z0NUeu4PBzGHEJPMz15aVBvYbxTnmcvX15jBTdZQqhg32e7fZJfTP3IbuNbyjr/i8VI19RyBs4ZRSPbOyawVLhbgwH8HYJlzqCGyHk1x4llmfwwOx6MpEFUCy8Vp0KbB4XjiWsG9t5vNzVjuo/qa3DEHDm7335XLVbQ38QkquEB47fZhtiFGJraz/HQ1eDhFXfypZZepyKD/P4Jt5hdt3j4+VrODI6mDSpuUMzkh5DmVY4xayDEV9a4rutF6WgkFX/SC6Y5bX9sQY8zwT+zf1dSbOtm2MXDC7crhfwFpYEhqXE1aK8xQX6Vx4nYmJNtitKp6MxYpmxifugCxBOFRCH1ff8y/WHOcyJS3VFUNYGwi3NJGrdhPKG2yZnmVRbP3b2Gtqvto0ycPLUbiUQBnNkcuXIFpJTq2cOgSXQzQcZYOUaWq//5preSxUIdvAAAAAElFTkSuQmCC";
 
+	var NodalApp = {
+		load_more_map: {}
+	};
 
 	$("#search_form").hide();
 
@@ -373,66 +376,81 @@
 	};
 	var getNextGroup = getNextGroupFunction();
 
-	var getAndMergeFollowers = function (user, callback) {
-		var groupToUse = getNextGroup();
+	var update_graph_from_network = function (user, followerData, groupToUse) {
+		var source = null, sourceNode = null;
 
-		Nodal.get_social_network(user, function (network) {
-			var followerData = {items:network};
-			var source = null, sourceNode = null;
+		// find index of the person to follow in the list of existing nodes
+		// so we can use it as the source when setting up the links
+		var force_nodes_length = force.nodes().length;
+		var force_node = null;
+		for (var i = 0; i < force_nodes_length; ++i) {
+			force_node = force.nodes()[i];
+			if (force_node.id === user.id) {
+				sourceNode = force_node;
+				source = i;
+				break;
+			}
+		}
 
-			// find index of the person to follow in the list of existing nodes
-			// so we can use it as the source when setting up the links
-			var force_nodes_length = force.nodes().length;
-			var force_node = null;
-			for (var i = 0; i < force_nodes_length; ++i) {
-				force_node = force.nodes()[i];
-				if (force_node.id === user.id) {
-					sourceNode = force_node;
-					source = i;
-					break;
-				}
+		_.each(followerData.items, function (person, idx) {
+			var target = idx, targetNode,
+				nodeExists = false, linkExists = false,
+				targetInfo = null;
+
+			targetInfo = doesNodeExist(person);
+			if (targetInfo) {
+				target = targetInfo.index;
+				targetNode = targetInfo.node;
+				nodeExists = true;
 			}
 
-			_.each(followerData.items, function (person, idx) {
-				var target = idx, targetNode,
-					nodeExists = false, linkExists = false,
-					targetInfo = null;
+			if (!nodeExists) {
+				person.name = person.displayName;
+				person.group = groupToUse;
+				person.picture = person.scaledPictureURL;
 
-				targetInfo = doesNodeExist(person);
-				if (targetInfo) {
-					target = targetInfo.index;
-					targetNode = targetInfo.node;
-					nodeExists = true;
-				}
+				target = force.nodes().length;
+				targetNode = person;
 
-				if (!nodeExists) {
-					person.name = person.displayName;
-					person.group = groupToUse;
-					person.picture = person.scaledPictureURL;
-
-					target = force.nodes().length;
-					targetNode = person;
-
-					force.nodes().push(person);
+				force.nodes().push(person);
 
 
+				force.links().push({
+					source: source,
+					target: force.nodes().length - 1,
+					value: 1
+				});
+			} else {
+				linkExists = doesLinkExist(sourceNode, targetNode, force.links());
+
+				if (!linkExists) {
 					force.links().push({
 						source: source,
-						target: force.nodes().length - 1,
+						target: target,
 						value: 1
 					});
-				} else {
-					linkExists = doesLinkExist(sourceNode, targetNode, force.links());
-
-					if (!linkExists) {
-						force.links().push({
-							source: source,
-							target: target,
-							value: 1
-						});
-					}
 				}
-			});
+			}
+		});
+	};
+
+	var getAndMergeFollowers = function (user, callback, network_loader) {
+		var groupToUse = getNextGroup();
+
+		network_loader = network_loader || Nodal.get_social_network;
+
+		network_loader(user, function (network, load_more_callback) {
+			var followerData = {items:network};
+
+			update_graph_from_network(user, followerData, groupToUse);
+
+			if (load_more_callback) {
+				NodalApp.load_more_map[user.login] = function () {
+					getAndMergeFollowers(user, callback, load_more_callback);
+				};
+			} else {
+				delete NodalApp.load_more_map[user.login];
+			}
 
 			if (callback) callback();
 		});
@@ -548,7 +566,6 @@
 			.on("click", function (d) {
 				$("#loading").show();
 				loadPerson(d);
-				//getAndMergeFollowers(d, function () { redrawGraphsAndNodes(); });
 			});
 
 		showConnectionsBtn
