@@ -1,7 +1,7 @@
 (function () {
 	var root = this;
 	var Nodal = root.Nodal = {};
-	var log = function (msg) { console.log(msg); };
+	var log = function (msg) { if (window.console) console.log(msg); };
 
 	var listeners = {};
 	var signal_listeners = function (component, data) {
@@ -58,12 +58,16 @@
 
 		var requests = [], social_network = [];
 		var merge_networks = function (network) {
-			_.each(network, GitHubNodal.adjust_user_detail);
-			social_network = _.union(social_network, network);
+			_.each(network, function (user) {
+				if (!_.find(social_network, function (u) { return u.id === user.id; })) {
+					GitHubNodal.adjust_user_detail(user);
+					social_network.push(user);
+				}
+			});
 		};
 
 		_.each(["followers", "following"], function (rel) {
-			var count = has_user_data ? user[rel] : 0;
+			var count = has_user_data && user[rel] ? user[rel] : 0;
 			var required_page_count = Math.floor(count / page_size) + 1;
 
 			_.times(required_page_count, function (page) {
@@ -78,18 +82,22 @@
 		});
 	};
 
-	GitHubNodal.get_user_detail = function (username, callback) {
+	GitHubNodal.get_user_detail = function (user, callback) {
 		var handler = function (data, text_status, jqXHR) {
 			GitHubNodal.adjust_user_detail(data);
 			log("Load user detail for " + data.login);
 			callback(data);
 		};
 
-		if (username) {
-			GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username), handler);
+		var endpoint = null;
+		if (user) {
+			endpoint = "users/" + (user.login || user);
 		} else if (GitHubNodal.get_access_token()) {
-			GitHubNodal.Util.get(GitHubNodal.api_url("user", handler, "json"), handler);
+			endpoint = "user";
 		}
+
+		if (endpoint)
+			GitHubNodal.Util.get(GitHubNodal.api_url(endpoint), handler);
 	};
 
 	GitHubNodal.follow_users = function(usernames, callback) {
