@@ -118,7 +118,8 @@
 				follow_requests.push(GitHubNodal.Util.put(GitHubNodal.api_url("user/following/" + username)));
 			});
 
-			$.when(follow_requests).then(function(){
+			$.when.apply(this, follow_requests).
+			then(function(){
 				if(callback){
 					callback(true);
 				}
