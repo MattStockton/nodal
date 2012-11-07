@@ -157,57 +157,61 @@
 		.attr("r", 24);
 
 	var redrawGraphsAndNodes = function () {
-		redraw({nodes:force.nodes(),links:force.links()});
+		
+      force.nodes(force.nodes())
+         .links(force.links())
+         .start();
+
+      var link = svg.selectAll("line.link")
+          .data(force.links());
+
+      link.enter().append("line")
+          .attr("class", "link")
+          .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+          .style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
+
+      link.exit().remove();
+
+      var tick = function() {
+          link.attr("x1", function(d) { return d.source.center ? d.source.x + 125 : d.source.x + 16; })
+              .attr("y1", function(d) { return d.source.center ? d.source.y + 32 : d.source.y + 16; })
+              .attr("x2", function(d) { return d.target.center ? d.target.x + 125 : d.target.x + 16; })
+              .attr("y2", function(d) { return d.target.center ? d.target.y + 32 : d.target.y + 16; });
+
+          node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+      };
+
+      var node = svg.selectAll("g.person")
+          .data(force.nodes());
+
+      node.enter().append("svg:g")
+          .attr("transform", function(d){ return "translate(10,10)";})
+          .attr("class", "person")
+          .call(force.drag);
+      node.exit().remove();
+
+      var people = svg.selectAll("g.person");
+      people.each(function(d){ 
+    	   if(d.center){
+    		   doCenterNodeInsert(d3.select(this))  
+    	   } else {
+    		   doAuxNodeInsert(d3.select(this)); 
+    	   }
+      });
+
+      // Make sure links are at the beginning of the svg for layering purposes
+      $("svg").find("line.link").detach().prependTo($("svg"));
+      // Make sure all expanded people are at ene end for layering purposes
+      forceExpandedPeopleToTop();
+            
+      force.stop();
+      force.gravity(0.03);
+      force.start();
+      force.on("tick", tick);
+
+      $("#loading").hide();
 	};
-
-	var redraw = function (json) {
-		force.nodes(json.nodes)
-			.links(json.links)
-			.start();
-
-		var link = svg.selectAll("line.link")
-			.data(json.links);
-
-		link.enter().append("line")
-			.attr("class", "link")
-			.style("stroke-width", function(d) { return Math.sqrt(d.value); })
-			.style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
-
-		link.exit().remove();
-
-		var tick = function() {
-			link.attr("x1", function(d) { return d.source.center ? d.source.x + 125 : d.source.x + 16; })
-				.attr("y1", function(d) { return d.source.center ? d.source.y + 32 : d.source.y + 16; })
-				.attr("x2", function(d) { return d.target.center ? d.target.x + 125 : d.target.x + 16; })
-				.attr("y2", function(d) { return d.target.center ? d.target.y + 32 : d.target.y + 16; });
-
-			node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-		};
-
-		var node = svg.selectAll("g.person")
-			.data(json.nodes);
-
-				node.enter().append("svg:g")
-			.attr("transform", function(d){ return "translate(10,10)";})
-			.attr("class", "person")
-			.call(force.drag);
-		node.exit().remove();
-
-		svg.selectAll("g.person").each(function(d){ d.center ? doCenterNodeInsert(d3.select(this)) : doAuxNodeInsert(d3.select(this)); });
-
-		// Make sure links are at the beginning of the svg for layering purposes
-		var allLinksJq = $("svg").find("line.link");
-		allLinksJq.detach().prependTo($("svg"));
-
-		force.stop();
-		force.gravity(0.03);
-		force.start();
-		force.on("tick", tick);
-
-		$("#loading").hide();
-	};
-
-
+	
 	var selectionBox = svg.selectAll("rect.selection-box")
 		.data([rectData])
 		.enter().append("svg:rect")
@@ -267,7 +271,7 @@
 				$selectionModal.append('<div class="selection-modal-title">Selected</div><div class="selection-modal-selected"></div>');
 
 				_.each(selectedPeople,function(person){
-					$selectionModal.find(".selection-modal-selected").append('<div class="selection-modal-person clearfix"><img src="' + (person.picture || missingImage) + '" width="20" height="20"><span class="person-name">' + person.name +'</span></div>');
+					$selectionModal.find(".selection-modal-selected").append('<div class="selection-modal-person clearfix"><img src="' + (person.avatar_url || missingImage) + '" width="20" height="20"><span class="person-name">' + person.login +'</span></div>');
 				});
 
 				$selectionModal.append('<div class="selection-modal-actions"><button type="button" class="js-github-follow github-follow">Follow on GitHub</button></div>');
@@ -514,11 +518,11 @@
 		}
 	};
 
-	function doCenterNodeInsert(d3Element){
-		var user = d3Element.data()[0];
-
-		d3Element
-			.attr("class", "person expanded");
+	function doCenterNodeInsert(d3Element){		
+	    // Remove all child elements of the person
+		d3.selectAll(d3Element[0][0].childNodes).remove();
+		
+		d3Element.attr("class", "person expanded");
 
 		d3Element
 			.append("svg:rect")
@@ -601,6 +605,7 @@
           .attr("x", 5)
           .attr("y", 14);
 
+	    var user = d3Element.data()[0];
 		if (NodalApp.load_more_map[user.login]) {
 			var load_more_btn = d3Element.append("svg:text")
 				.text("Load More")
@@ -621,24 +626,20 @@
 				rectData.resetRectSelection();
 				setupSelectionBoxAttributes(svg.select("rect.selection-box"));
 
-				var panel = d3Element;
-
-	            // Remove sub-elements from the person element before re-inserting
-				panel.selectAll("rect").remove();
-				panel.selectAll("text").remove();
-				panel.selectAll("g").remove();
-
 				d.center = false;
 				d.fixed = false;
 				// Re-insert as an aux node
-				doAuxNodeInsert(panel);
+				doAuxNodeInsert(d3Element);
+				forceExpandedPeopleToTop();
 
 				force.stop().start();
 			});
 	}
 
 	function doAuxNodeInsert(d3Element){
-
+		// Remove all child elements of the person
+		d3.selectAll(d3Element[0][0].childNodes).remove();
+		
 		d3Element.attr("class","person");
 
 		// set up circle portrait with clipping just to the pic
@@ -691,24 +692,20 @@
 
 			d3Element.selectAll("g.name-hover").remove();
 
-			// Me is now the circle_portriat
-			var me = d3.select(this);
-			me.attr("clip-path", "");
-
-			// Remove sub-elements from the person element before re-inserting
-			d3Element.selectAll("g").remove();
-			d3Element.selectAll("circle").remove();
-			d3Element.selectAll("image").remove();
-			d3Element.selectAll("rect").remove();
-			d3Element.selectAll("text").remove();
+			// This is the circle_portriat
+			d3.select(this).attr("clip-path", "");
 
 			d.center = true;
 			d.fixed = true;
 			// Re-insert the person element as a center node
 			doCenterNodeInsert(d3Element);
+			forceExpandedPeopleToTop();
 			force.start();
 		});
-
+	}
+	
+	function forceExpandedPeopleToTop(){
+	      $("svg").find(".person.expanded").detach().appendTo($("svg"));
 	}
 </script>
 </body>
