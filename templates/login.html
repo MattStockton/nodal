@@ -3,10 +3,14 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"">
+	
 	<title>Nodal</title>
-	<meta name="viewport" content="width=device-width">
+
+	<link rel="icon" type="image/png" href="/static/images/favicon.png">
+	
 	<link type="text/css" rel="stylesheet" href="static/css/nodal.css"/>
-	<script type="text/javascript" src="static/js/jquery-1.8.2.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.24.custom.css"/>
 </head>
 <body class="login">
 	<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
@@ -26,16 +30,57 @@
 			<img src="/static/images/logo.png">
 		</div>
 		<button type="button" class="js-github-login btn">Login with Github</button>
-	</div>
+		or search for a GitHub account
+		
+		 <div id="search_form">
+            <input id="search_field" placeholder="Search for a name..."/>
+        </div>
+	</div>	
 </body>
 
+<script src="static/js/jquery-1.8.2.min.js"></script>
+<script src="static/js/jquery-ui-1.8.24.custom.min.js"></script>
+<script src="static/js/underscore-min.js"></script>
+<script src="static/js/nodal.js"></script>
 <script>
 $(document).ready(function(){
+	var rate_limit_remaining = 1000;
+	
 	$(".js-github-login").on("click",function(){
-		window.location = "https://github.com/login/oauth/authorize?scope=user&client_id=" + "{{ client_id }}"
+		window.location = "https://github.com/login/oauth/authorize?scope=user&client_id=" + "{{ client_id }}";
 	});
-});
+	
+    Nodal.add_stats_listener(function (data) {
+    	rate_limit_remaining = data.API_RateLimit_Remaining;
+    });
+	
+	$("#search_form").hide();
+	
+    $("#search_field").autocomplete({
+        source:function (request, callback) {
+            var format_data = function (matches) {
+                var formatted_matches = _.map(matches, function (u) {
+                    return {label:u.name || u.login, value:u.login};
+                });
 
+                callback(formatted_matches);
+            }
+
+            if(rate_limit_remaining <= 0){
+            	// TODO KG Style
+            	alert("No more API calls remaining! Login to continue trying Nodal out");
+            	return;
+            }
+            Nodal.search(request.term, format_data);
+        },
+        select: function (evt, ui) {
+            window.location = "/without-login?username=" + ui.item.value;
+        }
+    }).click(function () { this.select(); });
+
+
+    $("#search_form").show();   
+});
 </script>
 
 </html>

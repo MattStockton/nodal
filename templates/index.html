@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"">
+	
 	<title>Nodal</title>
 	<script type="text/javascript" src="static/js/d3.v2.js"></script>
 
+	<link rel="icon" type="image/png" href="/static/images/favicon.png">
+	
 	<link type="text/css" rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.24.custom.css"/>
 	<link type="text/css" rel="stylesheet" href="static/css/nodal.css"/>
 	<link type="text/css" rel="stylesheet" href="static/css/tipsy.css"/>
@@ -70,6 +76,7 @@
 <script type="text/javascript">
 
     var github_access_token = "{{access_token}}";
+    var start_username = "{{start_username}}";
 
 	var width = $(window).width() - 20,
 		height = $(window).height() - 54,
@@ -321,8 +328,12 @@
 		});
 
 		// initially load currently logged in person's network
-		loadPerson();
-
+		if(start_username){
+			loadPerson(start_username);
+		} else {
+			loadPerson();		
+		}
+	
 		$("#search_field")
 			.autocomplete({
 				source:function (request, callback) {
@@ -579,18 +590,18 @@
 
 				var panel = d3Element;
 
+	            // Remove sub-elements from the person element before re-inserting
 				panel.selectAll("rect").remove();
 				panel.selectAll("text").remove();
 				panel.selectAll("g").remove();
 
 				d.center = false;
 				d.fixed = false;
+				// Re-insert as an aux node
 				doAuxNodeInsert(panel);
 
 				force.stop().start();
 			});
-
-		d3Element.selectAll("g.name-hover").remove();
 	}
 
 	function doAuxNodeInsert(d3Element){
@@ -620,8 +631,7 @@
 		var name_hover = d3Element
 			.append("svg:g")
 			.attr("class","name-hover")
-			.attr("transform","translate(42,-12)")
-			.attr("opacity",0);
+			.attr("transform","translate(42,-12)");
 
 		name_hover
 			.append("svg:rect")
@@ -636,22 +646,30 @@
 			.text(function(d){ return d.name; });
 
 		circle_portrait.on("mouseover", function(d){
-			name_hover.attr("opacity",1);
+			name_hover.attr("style","display:block");
 		}).on("mouseout",function(d){
-			name_hover.attr("opacity",0);
-		});
-
-		d3Element.on("click", function(d){
+			name_hover.attr("style","display:none");
+		}).on("click", function(d){
 			rectData.resetRectSelection();
 			setupSelectionBoxAttributes(svg.select("rect.selection-box"));
 
+			d3Element.selectAll("g.name-hover").remove();
+			
+			// Me is now the circle_portriat
 			var me = d3.select(this);
 			me.attr("clip-path", "");
-			me.selectAll("image").remove();
+			
+			// Remove sub-elements from the person element before re-inserting 
+			d3Element.selectAll("g").remove();
+			d3Element.selectAll("circle").remove();
+			d3Element.selectAll("image").remove();
+			d3Element.selectAll("rect").remove();
+			d3Element.selectAll("text").remove();
 
 			d.center = true;
 			d.fixed = true;
-			doCenterNodeInsert(me);
+			// Re-insert the person element as a center node
+			doCenterNodeInsert(d3Element);
 			force.start();
 		});
 

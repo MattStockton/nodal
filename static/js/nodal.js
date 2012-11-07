@@ -26,7 +26,7 @@
 			},
 
 			get: function (url, callback) {
-				return $.get(url, url, GitHubNodal.Util.catch_api_call(callback), "json");
+				return $.get(url, GitHubNodal.Util.catch_api_call(callback), "json");
 			},
 
 			put: function (url, callback) {
@@ -100,7 +100,7 @@
 				follow_requests.push(GitHubNodal.Util.put(GitHubNodal.api_url("user/following/" + username)));
 			});
 
-			$.when(follow_requests).done(function(){
+			$.when(follow_requests).then(function(){
 				if(callback){
 					callback(true);
 				}
