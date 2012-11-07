@@ -405,15 +405,12 @@
 			}
 
 			if (!nodeExists) {
-				person.name = person.displayName;
 				person.group = groupToUse;
-				person.picture = person.scaledPictureURL;
 
 				target = force.nodes().length;
 				targetNode = person;
 
 				force.nodes().push(person);
-
 
 				force.links().push({
 					source: source,
@@ -496,9 +493,7 @@
 			Nodal.get_user_detail(user, function (user_detail) {
 
 				if (!doesNodeExist(user_detail)) {
-					user_detail.name = user_detail.displayName;
 					user_detail.group = getNextGroup();
-					user_detail.picture = user_detail.scaledPictureURL;
 					user_detail.x = user_detail.px = (window.innerWidth / 2) + ((Math.random() * 200) - 100);
 					user_detail.y = user_detail.py = (window.innerHeight / 2) + ((Math.random() * 200) - 100);
 					user_detail.fixed = true;
@@ -538,7 +533,7 @@
 			.attr("clip-path", "url(#centerAvatarClip)")
 			.attr("transform", "translate(8,8)")
 			.append("svg:image")
-			.attr("xlink:href", function(d){ return d.scaledPictureURL || missingImage;})
+			.attr("xlink:href", function(d){ return d.avatar_url || missingImage;})
 			.attr("width", "48px")
 			.attr("height", "48px");
 
@@ -547,14 +542,18 @@
 			.attr("x", 64)
 			.attr("y", 28)
 			.style("font-size", 16)
-			.text(function(d){ return d.displayName;});
+			.text(function(d){
+				return d.login;
+			});
 
 		d3Element
 			.append("svg:text")
 			.attr("x", 64)
 			.attr("y", 48)
 			.style("font-size", 11)
-			.text(function(d){ return d.eMailAddress;});
+			.text(function(d){
+				return "";
+			});
 
 		var showConnectionsBtn = d3Element
 			.append("svg:g")
@@ -648,7 +647,9 @@
 		circle_portrait
 			.attr("clip-path", "url(#auxAvatarClip)")
 			.append("svg:image")
-			.attr("xlink:href", function(d){ return d.picture || missingImage;})
+			.attr("xlink:href", function(d){
+				return d.avatar_url || missingImage;
+			})
 			.attr("x", 0)
 			.attr("y", 0)
 			.attr("width", "40px")
@@ -677,7 +678,8 @@
 		name_hover
 			.append("svg:text")
 			.attr("transform","translate(10,16)")
-			.text(function(d){ return d.name; });
+			.text(function(d){
+				return d.login; });
 
 		circle_portrait.on("mouseover", function(d){
 			name_hover.attr("style","display:block");

@@ -132,9 +132,6 @@
 	};
 
 	GitHubNodal.adjust_user_detail = function (user) {
-		user.name = user.login;
-		user.displayName = user.login;
-		user.scaledPictureURL = user.avatar_url;
 	};
 
 	GitHubNodal.get_access_token = function () {
