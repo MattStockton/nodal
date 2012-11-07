@@ -53,7 +53,6 @@
 
 	GitHubNodal.get_social_network = function (user, callback, next_link) {
 		var page_size = 100;
-		var connections_loaded = 0;
 		var social_network = [];
 
 		var new_next_link = null;
@@ -62,6 +61,9 @@
 			var m = /<([^>]+)>; rel="next"/.exec(link);
 			if (m) new_next_link = m[1];
 		}
+		var load_more = function (_user, _callback) {
+			return GitHubNodal.get_social_network(user, _callback, new_next_link);
+		};
 
 		var rel = "followers";
 		var params = ["per_page=" + page_size];
@@ -81,10 +83,12 @@
 			}
 			sn_end_index = social_network.length - 1;
 
-			log("Loaded " + connections_loaded + " connections for " + user.login + " " + social_network[sn_start_index].id + "..." + social_network[sn_end_index].id);
-			callback(social_network, function (_user, _callback) {
-				return GitHubNodal.get_social_network(user, _callback, new_next_link);
-			});
+			log("Loaded connections for " + user.login + " " + social_network[sn_start_index].id + "..." + social_network[sn_end_index].id);
+			if (social_network.length < user.followers) {
+				callback(social_network, load_more);
+			} else {
+				callback(social_network);
+			}
 		});
 	};
 

@@ -169,9 +169,9 @@
 			.data(json.links);
 
 		link.enter().append("line")
-		.attr("class", "link")
-		.style("stroke-width", function(d) { return Math.sqrt(d.value); })
-		.style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
+			.attr("class", "link")
+			.style("stroke-width", function(d) { return Math.sqrt(d.value); })
+			.style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
 
 		link.exit().remove();
 
@@ -182,15 +182,15 @@
 				.attr("y2", function(d) { return d.target.center ? d.target.y + 32 : d.target.y + 16; });
 
 			node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-		  };
+		};
 
 		var node = svg.selectAll("g.person")
 			.data(json.nodes);
 
 				node.enter().append("svg:g")
-					.attr("transform", function(d){ return "translate(10,10)";})
-					.attr("class", "person")
-					.call(force.drag);
+			.attr("transform", function(d){ return "translate(10,10)";})
+			.attr("class", "person")
+			.call(force.drag);
 		node.exit().remove();
 
 		svg.selectAll("g.person").each(function(d){ d.center ? doCenterNodeInsert(d3.select(this)) : doAuxNodeInsert(d3.select(this)); });
@@ -209,17 +209,17 @@
 
 
 	var selectionBox = svg.selectAll("rect.selection-box")
-	.data([rectData])
-	.enter().append("svg:rect")
-	.attr("class", "selection-box")
-	.attr("x", function(d){ return d.startX;})
-	.attr("y", function(d){ return d.startY;})
-	.attr("height", function(d){return d.endX - d.startX;})
-	.attr("width", function(d){return d.endY - d.startY})
-	.style("fill", "#CCC")
-	.style("fill-opacity", 0.2)
-	.style("stroke", "#999")
-	.style("stroke-opacity", 0.5);
+		.data([rectData])
+		.enter().append("svg:rect")
+		.attr("class", "selection-box")
+		.attr("x", function(d){ return d.startX;})
+		.attr("y", function(d){ return d.startY;})
+		.attr("height", function(d){return d.endX - d.startX;})
+		.attr("width", function(d){return d.endY - d.startY})
+		.style("fill", "#CCC")
+		.style("fill-opacity", 0.2)
+		.style("stroke", "#999")
+		.style("stroke-opacity", 0.5);
 
 	svg.on("mousedown", function(d){
 		isMouseDown = true;
@@ -493,11 +493,7 @@
 		// check if person has been fully loaded
 		if (!_.isObject(user) || !user.followers) {
 
-			var username = user;
-			if (user && (_.isString(user) || user.login))
-				username = user || user.login;
-
-			Nodal.get_user_detail(username, function (user_detail) {
+			Nodal.get_user_detail(user, function (user_detail) {
 
 				if (!doesNodeExist(user_detail)) {
 					user_detail.name = user_detail.displayName;
@@ -524,6 +520,7 @@
 	};
 
 	function doCenterNodeInsert(d3Element){
+		var user = d3Element.data()[0];
 
 		d3Element
 			.attr("class", "person expanded");
@@ -604,6 +601,14 @@
           .text("Open Profile")
           .attr("x", 5)
           .attr("y", 14);
+
+		if (NodalApp.load_more_map[user.login]) {
+			var load_more_btn = d3Element.append("svg:text")
+				.text("Load More")
+				.on("click", function (u) {
+					NodalApp.load_more_map[u.login]();
+				});
+		}
 
 		d3Element
 			.append("svg:text")
