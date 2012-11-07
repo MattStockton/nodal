@@ -11,6 +11,8 @@
 	
 	<link type="text/css" rel="stylesheet" href="static/css/nodal.css"/>
 	<link type="text/css" rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.24.custom.css"/>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+	
 </head>
 <body class="login">
 	<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
@@ -26,15 +28,25 @@
 	{% endwith %}
 
 	<div id="login">
-		<div class="login-logo">
-			<img src="/static/images/logo.png">
-		</div>
-		<button type="button" class="js-github-login btn">Login with Github</button>
-		or search for a GitHub account
-		
-		 <div id="search_form">
-            <input id="search_field" placeholder="Search for a name..."/>
-        </div>
+		<div class="login-logo">Nodal</div>
+		<div class="login-options">
+			<div class="github-option">
+				<button type="button" class="js-github-login btn">Login with your Github profile</button>
+			</div>
+			<div class="search-option clearfix">
+				<div id="search_form">
+					<label>Or search for a GitHub account:</label>
+		            <input id="search_field" placeholder="e.g. DHH"/>
+		        </div>
+			</div>
+			<div class="explanation">
+				<h2>A word before you start...</h2>
+				<ul>
+					<li>You might be asked to grant us access to change your Github profile. We provide a way for you to follow people after navigating the network graph. This is the only thing we change&mdash;scout's honor.</li>
+					<li>This is a <a href="http://d3js.org/">D3.js</a> experiment by <a href="http://jvogt.net/">Jesse Vogt</a>, <a href="http://mattstockton.com">Matt Stockton</a>, and <a href="http://krisgosser.com">Kris G&ouml;sser</a>. They work at <a href="http://harqen.com">HarQen</a> in Milwaukee.</li>
+				</ul>
+			</div>
+	    </div>
 	</div>	
 </body>
 

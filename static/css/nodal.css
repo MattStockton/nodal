@@ -1,6 +1,6 @@
 html, body {
 	margin: 0;
-	font-family: Arial, sans-serif;
+	font-family: "Source Sans Pro", "Helvetica", Arial, sans-serif;
 }
 html .clearfix:after {
 	content: ".";
@@ -41,11 +41,11 @@ html .clearfix:after {
 	float: left;
 	padding: 0 10px;
 }
-#search_form {
+.nav-search {
 	float: right;
 	padding: 12px;
 }
-#search_form input {
+.nav-search input {
 	padding: 5px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
@@ -93,11 +93,9 @@ html .clearfix:after {
 	display: block;
 	margin-bottom: 5px;
 	font-size: 11px;
-	font-family: Arial;
 }
 #sliders span {
 	display: block;
-	font-family: Arial;
 	font-size: 10px;
 	color: #888;
 	text-align: center;
@@ -240,16 +238,44 @@ circle.aux-border {
 
 /* login */
 body.login {
-	background: #FFF;
+	background: url(../images/logo-bg.png) no-repeat -150px -150px #FFF;
 }
 #login {
-	margin: 50px auto;
-	width: 300px;
+	margin: 100px;
+	width: 350px;
+	background: rgba(255,255,255,0.9);
+	border: 1px solid #EEEEE8;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
 }
 .login-logo {
-	margin-bottom: 20px;
+	padding: 20px;
+	font-size: 36px;
+	text-align: center;
 }
-.login form input {
+.github-option {
+	padding: 20px;
+	border-bottom: 1px solid #EEEEE8;
+}
+.github-option button {
+	display: block;
+	border: 1px solid #EEE;
+	background: url(../images/github-logo-btn.png) no-repeat 20px 10px rgba(238,238,232,0.6);
+	color: #555;
+	font-size: 16px;
+	padding: 12px 20px 12px 50px;
+	font-family: "Source Sans Pro", "Helvetica", Arial, sans-serif;
+	width: 100%;
+}
+.github-option button:hover {
+	background-color: #EEEEE8;
+}
+.search-option {
+	padding: 20px;
+	border-bottom: 1px solid #EEEEE8;
+}
+.search-option input {
 	display: block;
 	width: 290px;
 	padding: 5px;
@@ -257,12 +283,21 @@ body.login {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	border: none;
+	border: 1px solid #EEEEE8;
 }
-.login button {
-	border: none;
-	background: url(../images/github-logo-btn.png) no-repeat 10px 10px #E9E9E9;
-	color: #555;
+.explanation {
+	padding: 20px;
+}
+.explanation h2 {
 	font-size: 18px;
-	padding: 15px 25px 15px 50px;
+	margin: 0 0 15px;
+}
+.explanation ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+.explanation ul li {
+	font-size: 14px;
+	margin: 15px 0;
 }
