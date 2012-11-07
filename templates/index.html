@@ -499,8 +499,8 @@
 					user_detail.name = user_detail.displayName;
 					user_detail.group = getNextGroup();
 					user_detail.picture = user_detail.scaledPictureURL;
-					user_detail.x = window.innerWidth / 2;
-					user_detail.y = window.innerHeight / 2;
+					user_detail.x = user_detail.px = (window.innerWidth / 2) + ((Math.random() * 200) - 100);
+					user_detail.y = user_detail.py = (window.innerHeight / 2) + ((Math.random() * 200) - 100);
 					user_detail.fixed = true;
 
 					force.nodes().push(user_detail);
