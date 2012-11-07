@@ -4,12 +4,12 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"">
-	
+
 	<title>Nodal</title>
 	<script type="text/javascript" src="static/js/d3.v2.js"></script>
 
 	<link rel="icon" type="image/png" href="/static/images/favicon.png">
-	
+
 	<link type="text/css" rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.24.custom.css"/>
 	<link type="text/css" rel="stylesheet" href="static/css/nodal.css"/>
 	<link type="text/css" rel="stylesheet" href="static/css/tipsy.css"/>
@@ -331,9 +331,9 @@
 		if(start_username){
 			loadPerson(start_username);
 		} else {
-			loadPerson();		
+			loadPerson();
 		}
-	
+
 		$("#search_field")
 			.autocomplete({
 				source:function (request, callback) {
@@ -373,19 +373,21 @@
 	};
 	var getNextGroup = getNextGroupFunction();
 
-	var getAndMergeFollowers = function (id, callback) {
-
+	var getAndMergeFollowers = function (user, callback) {
 		var groupToUse = getNextGroup();
-		Nodal.get_social_network(id, function (network) {
+
+		Nodal.get_social_network(user, function (network) {
 			var followerData = {items:network};
-			var source = null, sourceNode = null,
-				i = 0;
+			var source = null, sourceNode = null;
 
 			// find index of the person to follow in the list of existing nodes
 			// so we can use it as the source when setting up the links
-			for (i = 0; i < force.nodes().length; ++i) {
-			if (force.nodes()[i].id === id || force.nodes()[i].login === id) {
-					sourceNode = force.nodes()[i];
+			var force_nodes_length = force.nodes().length;
+			var force_node = null;
+			for (var i = 0; i < force_nodes_length; ++i) {
+				force_node = force.nodes()[i];
+				if (force_node.id === user.id) {
+					sourceNode = force_node;
 					source = i;
 					break;
 				}
@@ -396,7 +398,7 @@
 					nodeExists = false, linkExists = false,
 					targetInfo = null;
 
-				targetInfo = doesNodeExist(person.id);
+				targetInfo = doesNodeExist(person);
 				if (targetInfo) {
 					target = targetInfo.index;
 					targetNode = targetInfo.node;
@@ -437,60 +439,69 @@
 	};
 
 	var doesLinkExist = function (source, target, links) {
-		var links_length = links.length, i = 0,
-			link_node;
+		var links_length = links.length,
+			i = 0, link;
 		for (; i < links_length; ++i) {
-			link_node = links[i];
-			if ((source.id === link_node.source.id && target.id === link_node.target.id) ||
-				(target.id === link_node.source.id && source.id === link_node.target.id)) {
+			link = links[i];
+			if ((source.id === link.source.id && target.id === link.target.id) ||
+				(target.id === link.source.id && source.id === link.target.id)) {
 				return true;
 			}
 		}
 		return false;
 	};
 
-	var doesNodeExist = function (id) {
+	var doesNodeExist = function (node) {
 		var force_nodes = force.nodes(),
 			force_nodes_length = force_nodes.length,
-			i = 0;
-
+			i = 0, existing_node;
 		for (; i < force_nodes_length; ++i) {
-			if (force_nodes[i].id == id) {
+			existing_node = force_nodes[i];
+			if (existing_node.id === node.id) {
 				return {
-					node: force_nodes[i],
+					node: existing_node,
 					index: i
 				};
 			}
 		}
-
 		return null;
 	};
 
 	var loadPerson = function (initialPersonId) {
 		$("#loading").show();
 
-		if (doesNodeExist(initialPersonId)) {
-			getAndMergeFollowers(initialPersonId, function () {
-				redrawGraphsAndNodes();
-			});
-		} else {
-			Nodal.get_user_detail(initialPersonId, function (initialPersonData) {
-				var initialPersonNode = initialPersonData,
-					nodes, i;
+		var user = initialPersonId;
 
-				initialPersonNode.name = initialPersonData.displayName;
-				initialPersonNode.group = getNextGroup();
-				initialPersonNode.picture = initialPersonData.scaledPictureURL;
-				initialPersonData.x = window.innerWidth / 2;
-				initialPersonData.y = window.innerHeight / 2;
-				initialPersonData.fixed = true;
+		// check if person has been fully loaded
+		if (!_.isObject(user) || !user.followers) {
 
-				force.nodes().push(initialPersonNode);
+			var username = user;
+			if (user && (_.isString(user) || user.login))
+				username = user || user.login;
 
-				getAndMergeFollowers(initialPersonData.login, function () {
+			Nodal.get_user_detail(username, function (user_detail) {
+
+				if (!doesNodeExist(user_detail)) {
+					user_detail.name = user_detail.displayName;
+					user_detail.group = getNextGroup();
+					user_detail.picture = user_detail.scaledPictureURL;
+					user_detail.x = window.innerWidth / 2;
+					user_detail.y = window.innerHeight / 2;
+					user_detail.fixed = true;
+
+					force.nodes().push(user_detail);
+				}
+
+				getAndMergeFollowers(user_detail, function () {
 					redrawGraphsAndNodes();
 				});
 			});
+		} else {
+			if (doesNodeExist(user)) {
+				getAndMergeFollowers(user, function () {
+					redrawGraphsAndNodes();
+				});
+			}
 		}
 	};
 
@@ -536,7 +547,8 @@
 			.attr("class","show-connections")
 			.on("click", function (d) {
 				$("#loading").show();
-				getAndMergeFollowers(d.login, function () { redrawGraphsAndNodes(); });
+				loadPerson(d);
+				//getAndMergeFollowers(d, function () { redrawGraphsAndNodes(); });
 			});
 
 		showConnectionsBtn
@@ -590,12 +602,14 @@
 
 				var panel = d3Element;
 
+	            // Remove sub-elements from the person element before re-inserting
 				panel.selectAll("rect").remove();
 				panel.selectAll("text").remove();
 				panel.selectAll("g").remove();
 
 				d.center = false;
 				d.fixed = false;
+				// Re-insert as an aux node
 				doAuxNodeInsert(panel);
 
 				force.stop().start();
@@ -605,7 +619,7 @@
 	function doAuxNodeInsert(d3Element){
 
 		d3Element.attr("class","person");
-		
+
 		// set up circle portrait with clipping just to the pic
 		var circle_portrait = d3Element.append("g").attr("class","circle-portrait");
 
@@ -652,14 +666,22 @@
 			setupSelectionBoxAttributes(svg.select("rect.selection-box"));
 
 			d3Element.selectAll("g.name-hover").remove();
-			
+
+			// Me is now the circle_portriat
 			var me = d3.select(this);
 			me.attr("clip-path", "");
-			me.selectAll("image").remove();
+
+			// Remove sub-elements from the person element before re-inserting
+			d3Element.selectAll("g").remove();
+			d3Element.selectAll("circle").remove();
+			d3Element.selectAll("image").remove();
+			d3Element.selectAll("rect").remove();
+			d3Element.selectAll("text").remove();
 
 			d.center = true;
 			d.fixed = true;
-			doCenterNodeInsert(me);
+			// Re-insert the person element as a center node
+			doCenterNodeInsert(d3Element);
 			force.start();
 		});
 
