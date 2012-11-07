@@ -363,7 +363,7 @@
 	var getNextGroup = getNextGroupFunction();
 
 	var getAndMergeFollowers = function (id, callback) {
-
+		var username = _.isObject(id) ? id.login : id;
 		var groupToUse = getNextGroup();
 		Nodal.get_social_network(id, function (network) {
 			var followerData = {items:network};
@@ -373,11 +373,11 @@
 			// find index of the person to follow in the list of existing nodes
 			// so we can use it as the source when setting up the links
 			for (i = 0; i < force.nodes().length; ++i) {
-			if (force.nodes()[i].id === id || force.nodes()[i].login === id) {
-					sourceNode = force.nodes()[i];
-					source = i;
-					break;
-				}
+				if (force.nodes()[i].id === username || force.nodes()[i].login === username) {
+						sourceNode = force.nodes()[i];
+						source = i;
+						break;
+					}
 			}
 
 			_.each(followerData.items, function (person, idx) {
@@ -476,7 +476,7 @@
 
 				force.nodes().push(initialPersonNode);
 
-				getAndMergeFollowers(initialPersonData.login, function () {
+				getAndMergeFollowers(initialPersonData, function () {
 					redrawGraphsAndNodes();
 				});
 			});
@@ -525,7 +525,7 @@
 			.attr("class","show-connections")
 			.on("click", function (d) {
 				$("#loading").show();
-				getAndMergeFollowers(d.login, function () { redrawGraphsAndNodes(); });
+				getAndMergeFollowers(d, function () { redrawGraphsAndNodes(); });
 			});
 
 		showConnectionsBtn
@@ -596,7 +596,7 @@
 	function doAuxNodeInsert(d3Element){
 
 		d3Element.attr("class","person");
-		
+
 		// set up circle portrait with clipping just to the pic
 		var circle_portrait = d3Element.append("g").attr("class","circle-portrait");
 

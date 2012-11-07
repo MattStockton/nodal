@@ -51,13 +51,29 @@
 		}
 	};
 
-	GitHubNodal.get_social_network = function (username, callback) {
-		$.when(
-			GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username + "/following")),
-			GitHubNodal.Util.get(GitHubNodal.api_url("users/" + username + "/followers"))
-		).done(function (following, followers) {
-			var social_network = _.union(following[0], followers[0]);
-			_.each(social_network, GitHubNodal.adjust_user_detail);
+	GitHubNodal.get_social_network = function (user, callback) {
+		var has_user_data = _.isObject(user);
+		var username = has_user_data ? user.login : user;
+		var page_size = 100;
+
+		var requests = [], social_network = [];
+		var merge_networks = function (network) {
+			_.each(network, GitHubNodal.adjust_user_detail);
+			social_network = _.union(social_network, network);
+		};
+
+		_.each(["followers", "following"], function (rel) {
+			var count = has_user_data ? user[rel] : 0;
+			var required_page_count = Math.floor(count / page_size) + 1;
+
+			_.times(required_page_count, function (page) {
+				var params = ["page=" + page, "per_page=" + page_size];
+				var url = GitHubNodal.api_url("users/" + username + "/" + rel, params);
+				requests.push(GitHubNodal.Util.get(url, merge_networks));
+			});
+		});
+
+		$.when.apply(this, requests).done(function () {
 			callback(social_network);
 		});
 	};
@@ -104,13 +120,19 @@
 
 	GitHubNodal.get_access_token = function () {
 		if (window.github_access_token)
-			return "?access_token=" + github_access_token;
+			return "access_token=" + github_access_token;
 		else
 			return "";
 	}
 
-	GitHubNodal.api_url = function (endpoint) {
-		return GitHubNodal.API_BASE_URL + endpoint + GitHubNodal.get_access_token();
+	GitHubNodal.api_url = function (endpoint, query_params) {
+		var qp = [];
+		if (GitHubNodal.get_access_token())
+			qp.push(GitHubNodal.get_access_token())
+		if (query_params)
+			qp = _.union(qp, query_params)
+
+		return GitHubNodal.API_BASE_URL + endpoint + "?" + qp.join("&");
 	};
 
 	GitHubNodal.search = function (term, callback) {
