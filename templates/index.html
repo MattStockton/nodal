@@ -18,6 +18,20 @@
 <body>
 
 <div id="meta">
+	<div id="logo">
+		<img src="/static/images/logo.png">
+	</div>
+	<div id="nav" class="clearfix">
+		<div id="header_buttons">
+			<button id="adjust_phyics" type="button" class="btn">Adjust Physics</button>
+			<button id="logout" type="button" class="btn">Logout</button>
+		</div>
+		<div class="api-info" title="Huh? This is the number of requests your API token has left with GitHub. Every new login instance gets 5000 requests."><span class="api-info-label">Requests remaining:</span><span id="api_limit_info"></span></div>
+		<div id="search_form" class="nav-search">
+			<input id="search_field" placeholder="Search for a name, e.g. mbostock"/>
+		</div>
+		<div id="loading"><span><img src="/static/images/loading.gif" height="12" alt="Loading..."></span></div>
+	</div>
 	<div id="sliders">
 		<div class="slider">
 			<label>Link Distance</label>
@@ -49,20 +63,6 @@
 			<input type="range" id="force_gravity" min="0" max="1" value="0.03" step="0.03"/>
 			<span id="force_gravity_val">0.03</span>
 		</div>
-	</div>
-	<div id="logo">
-		<img src="/static/images/logo.png">
-	</div>
-	<div id="nav" class="clearfix">
-		<div id="header_buttons">
-			<button id="adjust_phyics" type="button" class="btn">Adjust Physics</button>
-			<button id="logout" type="button" class="btn">Logout</button>
-			<span id=api_limit_info></span>
-		</div>
-		<div id="search_form" class="nav-search">
-			<input id="search_field" placeholder="Search for a name..."/>
-		</div>
-		<div id="loading"><span><img src="/static/images/loading.gif" height="12" alt="Loading..."></span></div>
 	</div>
 </div>
 

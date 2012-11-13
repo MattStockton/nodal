@@ -18,6 +18,7 @@ html .clearfix:after {
 	left: 0;
 	width: 100%;
 	background: #EEEEE8;
+	border-bottom: 1px solid #D8D8C8;
 }
 .btn {
 	cursor: pointer;
@@ -35,11 +36,13 @@ html .clearfix:after {
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	padding: 5px 10px;
+	margin: 0;
 }
 
 #logo {
 	float: left;
 	padding: 0 10px;
+	height: 50px;
 }
 .nav-search {
 	float: right;
@@ -52,16 +55,18 @@ html .clearfix:after {
 	border-radius: 3px;
 	border: 1px solid #CCC;
 	width: 200px;
+	margin: 0;
 }
 #header_buttons {
 	float: right;
 	padding: 12px;
-	margin-left: 30px;
 }
 #loading {
 	float: right;
-	padding: 14px;
 	margin-right: 30px;
+	padding: 50px;
+	height: 18px;
+	line-height: 50px;
 }
 #loading span {
 	display: block;
@@ -103,11 +108,22 @@ html .clearfix:after {
 input[type=range] {
 	
 }
+.api-info {
+	float: right;
+	color: #999;
+	font-size: 12px;
+	height: 50px;
+	line-height: 50px;
+	padding: 0 10px;
+}
+.api-info .api-info-label {
+	margin-right: 5px;
+}
 
 
 /* chart */
 #chart {
-	margin-top: 50px;
+	margin-top: 49px;
 }
 circle.node {
   stroke: #fff;
@@ -309,4 +325,10 @@ body.login {
 .explanation ul li {
 	font-size: 14px;
 	margin: 15px 0;
+}
+
+
+#error_page {
+	margin: 20px auto;
+	width: 300px;
 }
