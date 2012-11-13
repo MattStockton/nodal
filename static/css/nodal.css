@@ -64,9 +64,8 @@ html .clearfix:after {
 #loading {
 	float: right;
 	margin-right: 30px;
-	padding: 50px;
+	padding: 12px;
 	height: 18px;
-	line-height: 50px;
 }
 #loading span {
 	display: block;
@@ -115,15 +114,59 @@ input[type=range] {
 	height: 50px;
 	line-height: 50px;
 	padding: 0 10px;
+	cursor: help;
 }
 .api-info .api-info-label {
 	margin-right: 5px;
+}
+#about_nodal {
+	position: relative;
+}
+.about-nodal {
+	display: none;
+	position: absolute;
+	top: 30px;
+	left: -135px;
+	width: 250px;
+}
+.about-nodal-inner {
+	background: rgba(0,0,0,0.7);
+	color: #E9E9E9;
+	font-size: 12px;
+	line-height: 17px;
+	padding: 7px 20px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+.about-nodal-inner a {
+	color: #FFF;
+	font-weight: bold;
+	margin: 0 2px;
+}
+.about-nodal:after {
+	bottom: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.about-nodal:after {
+	border-color: rgba(0, 0, 0, 0);
+	border-bottom-color: rgba(0,0,0,0.7);
+	border-width: 5px;
+	left: 169px;
+	margin-left: -10px;
 }
 
 
 /* chart */
 #chart {
 	margin-top: 49px;
+	width: 100%;
 }
 circle.node {
   stroke: #fff;
@@ -325,6 +368,10 @@ body.login {
 .explanation ul li {
 	font-size: 14px;
 	margin: 15px 0;
+}
+.explanation strong {
+	color: #F6284C;
+	margin-right: 10px;
 }
 
 
