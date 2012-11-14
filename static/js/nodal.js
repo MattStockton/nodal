@@ -83,7 +83,6 @@
 			}
 			sn_end_index = social_network.length - 1;
 
-			log("Loaded connections for " + user.login + " " + social_network[sn_start_index].id + "..." + social_network[sn_end_index].id);
 			if (social_network.length < user.followers) {
 				callback(social_network, load_more);
 			} else {
@@ -96,6 +95,7 @@
 		var handler = function (data, text_status, jqXHR) {
 			GitHubNodal.adjust_user_detail(data);
 			log("Load user detail for " + data.login);
+			data.detail_loaded = true;
 			callback(data);
 		};
 
