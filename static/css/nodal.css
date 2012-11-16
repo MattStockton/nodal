@@ -373,6 +373,17 @@ body.login {
 	color: #F6284C;
 	margin-right: 10px;
 }
+ul.flashes {
+	list-style-type: none;
+	margin: 20px;
+	padding: 0;
+	width: 350px;
+}
+ul.flashes li {
+	background: #FFF;
+	border: 1px solid #F10;
+	color: #F10;
+	padding: 10px;
 
 
 #error_page {
