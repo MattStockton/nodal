@@ -373,21 +373,22 @@ body.login {
 .github-option button {
 	display: block;
 	border: 1px solid #EEE;
-	background: url(../images/github-logo-btn.png) no-repeat 20px 10px rgba(238,238,232,0.8);
-	color: #555;
+	background: url(../images/github-logo-btn-white.png) no-repeat 25px 10px rgba(246,40,76,0.8);
+	color: #FFF;
 	font-size: 16px;
 	padding: 12px 20px 12px 50px;
 	font-family: "Source Sans Pro", "Helvetica", Arial, sans-serif;
 	width: 100%;
 }
 .github-option button:hover {
-	background-color: #EEEEE8;
+	background-color: rgba(246,40,76,1);
 }
 .search-option {
 	padding: 20px;
 	border-bottom: 1px solid #EEEEE8;
 }
 .search-option label {
+	font-weight: bold;
 	display: block;
 	font-size: 13px;
 	margin-bottom: 8px;
