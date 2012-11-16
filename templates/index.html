@@ -12,7 +12,6 @@
 
 	<link type="text/css" rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.24.custom.css"/>
 	<link type="text/css" rel="stylesheet" href="static/css/nodal.css"/>
-	<link type="text/css" rel="stylesheet" href="static/css/tipsy.css"/>
 
 </head>
 <body>
@@ -91,7 +90,6 @@
 <script src="static/js/jquery-ui-1.8.24.custom.min.js"></script>
 <script src="static/js/underscore-min.js"></script>
 <script src="static/js/nodal.js"></script>
-<script src="static/js/jquery.tipsy.js"></script>
 <script type="text/javascript">
 
     var github_access_token = "{{access_token}}";
@@ -103,7 +101,7 @@
 		color = d3.scale.category20(),
 		force = d3.layout.force();
 
-	var missingImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAEBUlEQVRYw4VYCXIjIQzk//9b7xDHThwfycaxA7xg5TmgpRbjqikXwwASrdblkHJJOben6NflyTLfPpXHQyvzMjMN6qusnMfLb64z47IwvhTcgNtwaUapeChpvyy2x+YqHg8XJcwRWd8PVcmk2bKLt+ir0/kGs2DwQU0TqGyUM0j0RCIGsxErzCBxQqJ0YPdM4J2iedO+tmXGBI1bj0EAxpVsjVIQ6gz8sqYp2vz1EyCa9RoiZvEkgYHNAou2EeCRabqMgaRuCS4fXSqp22urGdq6CukHmDtygq1ejC8lLbvezMLuBQ9jF2u15h3aFo4rk0cgPxIaSHGFrExhA71DBTXHIfWdyB2AyPYQdHXLpPoatI6aNRTaPO/XIBMZkbkERslkjqLjHRu49CDR3NS3Ii3Zy4KziJyWSfOb0sfpNGy3mxj/DIM8Mj6ezzLf1CoueY0RC+QOT16FywSx75+fl91ukj09iypR5q+3G8PmntM4Uc3jfPboKXfd7vcib5IKg1mhl92+4pFN9NTaVN4EmxWRQZ5TCeYgMiIe9ZE13QDabFSUEuBCmpuU1eT378uLKxh0imIdThCcjKo2wc1GbhUjr/+uVxRZqUB6DLJSG7QkLk0wYq6ERQPm6XJZsQJQZDh/fjruRtFoeg0m/SRVltl0NRIC3WFwX+URB+aKhGIx1hPsCJ7iSbFykRrjAkA03DTlmUnlKCUkTwkuUKfNcj+Q7dpinj/OSLScnKgMqJMhexWKm/qAmJEixEjSWKk6EpNCk/I7TGCJXACysA29t/t9Ey3yGweV4fb765c2Tk6o5si+jgY3GcTX1/U4ITrJGq5ceq1Dq7aJGZY71Uzn2UuHftCM4skrhR03V8EWov1CqG6W7NAH45E73NizMhMM5tlN6xrGe0odB3k8kr2ek10DE7hgMRkVq0Uh5vnyuXt/Z0NUeu4PBzGHEJPMz15aVBvYbxTnmcvX15jBTdZQqhg32e7fZJfTP3IbuNbyjr/i8VI19RyBs4ZRSPbOyawVLhbgwH8HYJlzqCGyHk1x4llmfwwOx6MpEFUCy8Vp0KbB4XjiWsG9t5vNzVjuo/qa3DEHDm7335XLVbQ38QkquEB47fZhtiFGJraz/HQ1eDhFXfypZZepyKD/P4Jt5hdt3j4+VrODI6mDSpuUMzkh5DmVY4xayDEV9a4rutF6WgkFX/SC6Y5bX9sQY8zwT+zf1dSbOtm2MXDC7crhfwFpYEhqXE1aK8xQX6Vx4nYmJNtitKp6MxYpmxifugCxBOFRCH1ff8y/WHOcyJS3VFUNYGwi3NJGrdhPKG2yZnmVRbP3b2Gtqvto0ycPLUbiUQBnNkcuXIFpJTq2cOgSXQzQcZYOUaWq//5preSxUIdvAAAAAElFTkSuQmCC";
+	var missing_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAEBUlEQVRYw4VYCXIjIQzk//9b7xDHThwfycaxA7xg5TmgpRbjqikXwwASrdblkHJJOben6NflyTLfPpXHQyvzMjMN6qusnMfLb64z47IwvhTcgNtwaUapeChpvyy2x+YqHg8XJcwRWd8PVcmk2bKLt+ir0/kGs2DwQU0TqGyUM0j0RCIGsxErzCBxQqJ0YPdM4J2iedO+tmXGBI1bj0EAxpVsjVIQ6gz8sqYp2vz1EyCa9RoiZvEkgYHNAou2EeCRabqMgaRuCS4fXSqp22urGdq6CukHmDtygq1ejC8lLbvezMLuBQ9jF2u15h3aFo4rk0cgPxIaSHGFrExhA71DBTXHIfWdyB2AyPYQdHXLpPoatI6aNRTaPO/XIBMZkbkERslkjqLjHRu49CDR3NS3Ii3Zy4KziJyWSfOb0sfpNGy3mxj/DIM8Mj6ezzLf1CoueY0RC+QOT16FywSx75+fl91ukj09iypR5q+3G8PmntM4Uc3jfPboKXfd7vcib5IKg1mhl92+4pFN9NTaVN4EmxWRQZ5TCeYgMiIe9ZE13QDabFSUEuBCmpuU1eT378uLKxh0imIdThCcjKo2wc1GbhUjr/+uVxRZqUB6DLJSG7QkLk0wYq6ERQPm6XJZsQJQZDh/fjruRtFoeg0m/SRVltl0NRIC3WFwX+URB+aKhGIx1hPsCJ7iSbFykRrjAkA03DTlmUnlKCUkTwkuUKfNcj+Q7dpinj/OSLScnKgMqJMhexWKm/qAmJEixEjSWKk6EpNCk/I7TGCJXACysA29t/t9Ey3yGweV4fb765c2Tk6o5si+jgY3GcTX1/U4ITrJGq5ceq1Dq7aJGZY71Uzn2UuHftCM4skrhR03V8EWov1CqG6W7NAH45E73NizMhMM5tlN6xrGe0odB3k8kr2ek10DE7hgMRkVq0Uh5vnyuXt/Z0NUeu4PBzGHEJPMz15aVBvYbxTnmcvX15jBTdZQqhg32e7fZJfTP3IbuNbyjr/i8VI19RyBs4ZRSPbOyawVLhbgwH8HYJlzqCGyHk1x4llmfwwOx6MpEFUCy8Vp0KbB4XjiWsG9t5vNzVjuo/qa3DEHDm7335XLVbQ38QkquEB47fZhtiFGJraz/HQ1eDhFXfypZZepyKD/P4Jt5hdt3j4+VrODI6mDSpuUMzkh5DmVY4xayDEV9a4rutF6WgkFX/SC6Y5bX9sQY8zwT+zf1dSbOtm2MXDC7crhfwFpYEhqXE1aK8xQX6Vx4nYmJNtitKp6MxYpmxifugCxBOFRCH1ff8y/WHOcyJS3VFUNYGwi3NJGrdhPKG2yZnmVRbP3b2Gtqvto0ycPLUbiUQBnNkcuXIFpJTq2cOgSXQzQcZYOUaWq//5preSxUIdvAAAAAElFTkSuQmCC";
 
 	var NodalApp = {
 		load_more_map: {}
@@ -175,62 +173,6 @@
 		.attr("cy", "24")
 		.attr("r", 24);
 
-	var redrawGraphsAndNodes = function () {
-
-		force.nodes(force.nodes())
-			.links(force.links())
-			.start();
-	
-		var link = svg.selectAll("line.link")
-			.data(force.links());
-	
-		link.enter().append("line")
-			.attr("class", "link")
-			.style("stroke-width", function(d) { return Math.sqrt(d.value); })
-			.style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
-	
-		link.exit().remove();
-	
-		var tick = function() {
-			link.attr("x1", function(d) { return d.source.center ? d.source.x + 125 : d.source.x + 16; })
-				.attr("y1", function(d) { return d.source.center ? d.source.y + 32 : d.source.y + 16; })
-				.attr("x2", function(d) { return d.target.center ? d.target.x + 125 : d.target.x + 16; })
-				.attr("y2", function(d) { return d.target.center ? d.target.y + 32 : d.target.y + 16; });
-	
-				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-		};
-	
-		var node = svg.selectAll("g.person")
-			.data(force.nodes());
-	
-		node.enter().append("svg:g")
-			.attr("transform", function(d){ return "translate(10,10)";})
-			.attr("class", "person")
-			.call(force.drag);
-		node.exit().remove();
-	
-		var people = svg.selectAll("g.person");
-		people.each(function(d){
-			if(d.center){
-				showExpandedView(d3.select(this))
-			} else {
-				showPictureOnlyView(d3.select(this));
-			}
-		});
-	
-		// Make sure links are at the beginning of the svg for layering purposes
-		$("svg").find("line.link").detach().prependTo($("svg"));
-		// Make sure all expanded people are at ene end for layering purposes
-		forceExpandedPeopleToTop();
-	
-		force.stop();
-		force.gravity(0.03);
-		force.start();
-		force.on("tick", tick);
-	
-		$("#loading").hide();
-		
-	}; // redraw graphics and nodes
 
 	var selectionBox = svg.selectAll("rect.selection-box")
 		.data([rectData])
@@ -291,7 +233,7 @@
 				$selectionModal.append('<div class="selection-modal-title">Selected</div><div class="selection-modal-selected"></div>');
 
 				_.each(selectedPeople,function(person){
-					$selectionModal.find(".selection-modal-selected").append('<div class="selection-modal-person clearfix"><img src="' + (person.avatar_url || missingImage) + '" width="20" height="20"><span class="person-name">' + person.login +'</span></div>');
+					$selectionModal.find(".selection-modal-selected").append('<div class="selection-modal-person clearfix"><img src="' + (person.avatar_url || missing_image) + '" width="20" height="20"><span class="person-name">' + person.login +'</span></div>');
 				});
 
 				$selectionModal.append('<div class="selection-modal-actions"><button type="button" class="js-github-follow github-follow btn">Follow on GitHub</button></div>');
@@ -352,7 +294,7 @@
                         $(".selection-modal").remove();
 					}
 					
-					show_system_feedback(new_html);
+					showSystemFeedback(new_html);
 				};
 				Nodal.follow_users(logins, done_callback);
 			}
@@ -390,7 +332,7 @@
 			$("#api_limit_info").html(data.API_RateLimit_Remaining + "/" + data.API_RateLimit_Limit);
 			
 			if(data.API_403_Error){
-				show_system_feedback('<span class="failure">No more API calls left. Please login!</span>');
+				showSystemFeedback('<span class="failure">No more API calls left. Please login!</span>');
 			}
 		});
 
@@ -410,8 +352,65 @@
 	        _.delay(show_drag_tip, 5000);			
 		}
 	});
+	
+    var redrawGraphsAndNodes = function () {
 
-	function setupSelectionBoxAttributes(selectionBox){
+        force.nodes(force.nodes())
+            .links(force.links())
+            .start();
+    
+        var link = svg.selectAll("line.link")
+            .data(force.links());
+    
+        link.enter().append("line")
+            .attr("class", "link")
+            .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+            .style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
+    
+        link.exit().remove();
+    
+        var tick = function() {
+            link.attr("x1", function(d) { return d.source.center ? d.source.x + 125 : d.source.x + 16; })
+                .attr("y1", function(d) { return d.source.center ? d.source.y + 32 : d.source.y + 16; })
+                .attr("x2", function(d) { return d.target.center ? d.target.x + 125 : d.target.x + 16; })
+                .attr("y2", function(d) { return d.target.center ? d.target.y + 32 : d.target.y + 16; });
+    
+                node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+        };
+    
+        var node = svg.selectAll("g.person")
+            .data(force.nodes());
+    
+        node.enter().append("svg:g")
+            .attr("transform", function(d){ return "translate(10,10)";})
+            .attr("class", "person")
+            .call(force.drag);
+        node.exit().remove();
+    
+        var people = svg.selectAll("g.person");
+        people.each(function(d){
+            if(d.center){
+                showExpandedView(d3.select(this))
+            } else {
+                showPictureOnlyView(d3.select(this));
+            }
+        });
+    
+        // Make sure links are at the beginning of the svg for layering purposes
+        $("svg").find("line.link").detach().prependTo($("svg"));
+        // Make sure all expanded people are at ene end for layering purposes
+        forceExpandedPeopleToTop();
+    
+        force.stop();
+        force.gravity(0.03);
+        force.start();
+        force.on("tick", tick);
+    
+        $("#loading").hide();
+        
+    }; // redraw graphics and nodes
+
+	var setupSelectionBoxAttributes = function setupSelectionBoxAttributes(selectionBox){
 		selectionBox.attr("x", function(d){ return Math.min(rectData.startX,rectData.endX);})
 		.attr("y", function(d){ return Math.min(rectData.startY, rectData.endY);})
 		.attr("width", function(d){return Math.abs(rectData.endX - rectData.startX);})
@@ -424,7 +423,7 @@
 	};
 	var getNextGroup = getNextGroupFunction();
 
-	var update_graph_from_network = function (user, followerData, groupToUse) {
+	var updateGraphFromNetwork = function (user, followerData, groupToUse) {
 		var source = null, sourceNode = null;
 
 		// find index of the person to follow in the list of existing nodes
@@ -479,11 +478,10 @@
 		});
 	};
 
-	var show_system_feedback = function(html_feedback){
+	var showSystemFeedback = function(html_feedback){
         $("#system_feedback").empty().html(html_feedback).fadeOut(3000, 
                 function(){
                    $("#system_feedback").empty().show();
-                   
                 }
          );
 	}
@@ -496,7 +494,7 @@
 		network_loader(user, function (network, load_more_callback) {
 			var followerData = {items:network};
 
-			update_graph_from_network(user, followerData, groupToUse);
+			updateGraphFromNetwork(user, followerData, groupToUse);
 
 			if (load_more_callback) {
 				NodalApp.load_more_map[user.login] = function () {
@@ -571,7 +569,7 @@
 		}
 	};
 
-	function showExpandedView(d3Element){
+	var showExpandedView = function(d3Element){
 	    // Remove all child elements of the person
 		d3.selectAll(d3Element[0][0].childNodes).remove();
 
@@ -590,7 +588,7 @@
 			.attr("clip-path", "url(#centerAvatarClip)")
 			.attr("transform", "translate(8,8)")
 			.append("svg:image")
-			.attr("xlink:href", function(d){ return d.avatar_url || missingImage;})
+			.attr("xlink:href", function(d){ return d.avatar_url || missing_image;})
 			.attr("width", "48px")
 			.attr("height", "48px");
 
@@ -694,7 +692,7 @@
 			});
 	}
 
-	function showPictureOnlyView(d3Element){
+	var showPictureOnlyView = function(d3Element){
 		// Remove all child elements of the person
 		d3.selectAll(d3Element[0][0].childNodes).remove();
 
@@ -707,7 +705,7 @@
 			.attr("clip-path", "url(#auxAvatarClip)")
 			.append("svg:image")
 			.attr("xlink:href", function(d){
-				return d.avatar_url || missingImage;
+				return d.avatar_url || missing_image;
 			})
 			.attr("x", 0)
 			.attr("y", 0)
@@ -784,7 +782,7 @@
 		});
 	}
 
-	function forceExpandedPeopleToTop(){
+	var forceExpandedPeopleToTop = function (){
 	      $("svg").find(".person.expanded").detach().appendTo($("svg"));
 	}
 </script>

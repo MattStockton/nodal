@@ -2,7 +2,7 @@ from flask import Flask, request, session, redirect, url_for, render_template, f
 import requests, sys, os
 
 app = Flask(__name__)
-app.debug = True
+app.debug = False
 app.secret_key = os.environ.get('APP_SECRET_KEY',None)
 
 GITHUB_API_CLIENT_ID = os.environ.get("GITHUB_API_CLIENT_ID",None)
@@ -78,5 +78,4 @@ def github_auth():
 	return redirect(url_for('index'))
 
 if __name__ == '__main__':
-	app.debug = False # Needed to do debugging in PyDev
-	app.run()
+	app.run(host='0.0.0.0')
