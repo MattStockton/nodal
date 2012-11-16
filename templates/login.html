@@ -80,8 +80,8 @@ $(document).ready(function(){
             }
 
             if(rate_limit_remaining <= 0){
-            	// TODO KG Style
-            	alert("No more API calls remaining! Login to continue trying Nodal out");
+            	var $dalert = $('<div class="login-alert">No more API calls remaining.<br>Login to continue using Nodal.<br><span>}</span></div>');
+            	$dalert.prependTo(".github-option");
             	return;
             }
             Nodal.search(request.term, format_data);
@@ -90,7 +90,6 @@ $(document).ready(function(){
             window.location = "/without-login?username=" + ui.item.value;
         }
     }).click(function () { this.select(); });
-
 
     $("#search_form").show();   
 });

@@ -30,6 +30,7 @@
 					<div class="about-nodal-inner">
 						<p>This is a <a href="http://d3js.org/" target="_blank">D3.js</a> experiment by <a href="http://jvogt.net/" target="_blank">Jesse Vogt</a>, <a href="http://mattstockton.com" target="_blank">Matt Stockton</a>, and <a href="http://krisgosser.com" target="_blank">Kris G&ouml;sser</a>. We work at <a href="http://harqen.com" target="_blank">HarQen</a> in Milwaukee. The idea originally took second place at an Oracle Open World hackathon.</p>
 						<p>Nodal is a fun way to view your network graph. We wanted to explore what it's like to navigate our network relationships visually. To illustrate the possibilities of node interactions, try drag-selecting a group of nodes. You can also click on individual nodes to get more detailed information and to expand the network.</p>
+						<p><a href="https://github.com/MattStockton/nodal" target="_blank" class="fork-link">Fork the project on GitHub</a></p>
 					</div>
 				</div>
 			</span>
@@ -42,6 +43,7 @@
 			<input id="search_field" placeholder="Search for a name, e.g. mbostock"/>
 		</div>
 		<div id="loading"><span><img src="/static/images/loading.gif" height="12" alt="Loading..."></span></div>
+		<div id="system_feedback"></div>
 	</div>
 	<div id="sliders">
 		<div class="slider">
@@ -76,7 +78,7 @@
 		</div>
 	</div>
 </div>
-
+<div class="drag-tip"><img src="/static/images/drag-tip.gif"></div>
 <div id="chart"></div>
 
 <script src="static/js/jquery-1.8.2.min.js"></script>
@@ -169,59 +171,60 @@
 
 	var redrawGraphsAndNodes = function () {
 
-      force.nodes(force.nodes())
-         .links(force.links())
-         .start();
-
-      var link = svg.selectAll("line.link")
-          .data(force.links());
-
-      link.enter().append("line")
-          .attr("class", "link")
-          .style("stroke-width", function(d) { return Math.sqrt(d.value); })
-          .style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
-
-      link.exit().remove();
-
-      var tick = function() {
-          link.attr("x1", function(d) { return d.source.center ? d.source.x + 125 : d.source.x + 16; })
-              .attr("y1", function(d) { return d.source.center ? d.source.y + 32 : d.source.y + 16; })
-              .attr("x2", function(d) { return d.target.center ? d.target.x + 125 : d.target.x + 16; })
-              .attr("y2", function(d) { return d.target.center ? d.target.y + 32 : d.target.y + 16; });
-
-          node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-      };
-
-      var node = svg.selectAll("g.person")
-          .data(force.nodes());
-
-      node.enter().append("svg:g")
-          .attr("transform", function(d){ return "translate(10,10)";})
-          .attr("class", "person")
-          .call(force.drag);
-      node.exit().remove();
-
-      var people = svg.selectAll("g.person");
-      people.each(function(d){
-    	   if(d.center){
-    		   showExpandedView(d3.select(this))
-    	   } else {
-    		   showPictureOnlyView(d3.select(this));
-    	   }
-      });
-
-      // Make sure links are at the beginning of the svg for layering purposes
-      $("svg").find("line.link").detach().prependTo($("svg"));
-      // Make sure all expanded people are at ene end for layering purposes
-      forceExpandedPeopleToTop();
-
-      force.stop();
-      force.gravity(0.03);
-      force.start();
-      force.on("tick", tick);
-
-      $("#loading").hide();
-	};
+		force.nodes(force.nodes())
+			.links(force.links())
+			.start();
+	
+		var link = svg.selectAll("line.link")
+			.data(force.links());
+	
+		link.enter().append("line")
+			.attr("class", "link")
+			.style("stroke-width", function(d) { return Math.sqrt(d.value); })
+			.style("stroke", function(d) {  return colorsArray[d.source.group % colorsArray.length];});
+	
+		link.exit().remove();
+	
+		var tick = function() {
+			link.attr("x1", function(d) { return d.source.center ? d.source.x + 125 : d.source.x + 16; })
+				.attr("y1", function(d) { return d.source.center ? d.source.y + 32 : d.source.y + 16; })
+				.attr("x2", function(d) { return d.target.center ? d.target.x + 125 : d.target.x + 16; })
+				.attr("y2", function(d) { return d.target.center ? d.target.y + 32 : d.target.y + 16; });
+	
+				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+		};
+	
+		var node = svg.selectAll("g.person")
+			.data(force.nodes());
+	
+		node.enter().append("svg:g")
+			.attr("transform", function(d){ return "translate(10,10)";})
+			.attr("class", "person")
+			.call(force.drag);
+		node.exit().remove();
+	
+		var people = svg.selectAll("g.person");
+		people.each(function(d){
+			if(d.center){
+				showExpandedView(d3.select(this))
+			} else {
+				showPictureOnlyView(d3.select(this));
+			}
+		});
+	
+		// Make sure links are at the beginning of the svg for layering purposes
+		$("svg").find("line.link").detach().prependTo($("svg"));
+		// Make sure all expanded people are at ene end for layering purposes
+		forceExpandedPeopleToTop();
+	
+		force.stop();
+		force.gravity(0.03);
+		force.start();
+		force.on("tick", tick);
+	
+		$("#loading").hide();
+		
+	}; // redraw graphics and nodes
 
 	var selectionBox = svg.selectAll("rect.selection-box")
 		.data([rectData])
@@ -285,7 +288,7 @@
 					$selectionModal.find(".selection-modal-selected").append('<div class="selection-modal-person clearfix"><img src="' + (person.avatar_url || missingImage) + '" width="20" height="20"><span class="person-name">' + person.login +'</span></div>');
 				});
 
-				$selectionModal.append('<div class="selection-modal-actions"><button type="button" class="js-github-follow github-follow">Follow on GitHub</button></div>');
+				$selectionModal.append('<div class="selection-modal-actions"><button type="button" class="js-github-follow github-follow btn">Follow on GitHub</button></div>');
 				$("body").append($selectionModal);
 			}
 
@@ -296,10 +299,10 @@
 		$("#adjust_phyics").click(function(){
 			$("#sliders").toggle();
 		});
-	      $("#logout").click(function(){
-	            window.location = "/logout";
-	        });
-
+		$("#logout").click(function(){
+			window.location = "/logout";
+		});
+		
 		$("#force_linkdistance").change(function(){
 			force.linkDistance(this.value).stop().start();
 			$("#force_linkdistance_val").html(this.value);
@@ -333,13 +336,12 @@
 
 				var done_callback = function(success){
 					if(success){
-					   $("#loading").hide();
-		               $(".selection-modal").remove();
-		               alert("Follow Success!") // TODO KG Style this
+						$("#loading").hide();
+						$(".selection-modal").remove();
+						$("#system_feedback").empty().html('<span class="success">Follow success</span>').fadeOut(10000);
 					} else {
-					   alert("Follow Failure!") // TODO KG Style this
+						$("#system_feedback").empty().html('<span class="failure">A problem trying to follow</span>').fadeOut(10000);
 					}
-
 				};
 				Nodal.follow_users(logins, done_callback);
 			}
@@ -380,6 +382,15 @@
 		$("#about_nodal_btn").on("click",function(){
 			$(".about-nodal").toggle();
 		});
+
+		var show_drag_tip = function(){
+			$(".drag-tip").show();
+			_.delay(hide_drag_tip, 5000);
+		};
+		var hide_drag_tip = function(){
+			$(".drag-tip").fadeOut();
+		};
+		_.delay(show_drag_tip, 5000);
 	});
 
 	function setupSelectionBoxAttributes(selectionBox){
@@ -559,20 +570,24 @@
 		d3Element
 			.append("svg:text")
 			.attr("x", 64)
-			.attr("y", 28)
-			.style("font-size", 16)
+			.attr("y", 25)
+			.attr("class", "username")
 			.text(function(d){
 				return d.login;
+			})
+			.on("click", function (d) {
+	        	window.open('https://github.com/' + d.login, '_blank');
+	        	window.focus();
 			});
 
 		d3Element
 			.append("svg:text")
 			.attr("x", 64)
-			.attr("y", 48)
+			.attr("y", 45)
 			.style("font-size", 11)
 			.text(function(d){
 				var tmpl = _.template(
-						"<%= repos %> public repo<%= repos == 1 ? '' : 's' %>, " +
+						"<%= repos %> repo<%= repos == 1 ? '' : 's' %>, " +
 						"<%= followers %> follower<%= followers == 1 ? '' : 's' %>, " +
 						"follows <%= following %>");
 				return tmpl({
@@ -594,7 +609,7 @@
 		showConnectionsBtn
 			.append("svg:rect")
 			.attr("class","show-connections-bg")
-			.attr("width",103)
+			.attr("width",83)
 			.attr("height",20)
 			.attr("rx",3)
           	.attr("ry",3);
@@ -604,34 +619,27 @@
 			.text("Show Followers")
 			.attr("x", 5)
 			.attr("y", 14);
-
-		var openProfileBtn = d3Element
-         .append("svg:g")
-         .attr("transform","translate(175,56)")
-         .attr("class","show-connections")
-         .on("click", function (d) {
-        	 window.open('https://github.com/' + d.login, '_blank');
-        	 window.focus();
-         });
-
-		openProfileBtn
-          .append("svg:rect")
-          .attr("class","show-connections-bg")
-          .attr("width",70)
-          .attr("height",20)
-          .attr("rx",3)
-          .attr("ry",3);
-
-		openProfileBtn
-          .append("svg:text")
-          .text("Open Profile")
-          .attr("x", 5)
-          .attr("y", 14);
-
-	    var user = d3Element.data()[0];
+			
+		var user = d3Element.data()[0];
 		if (NodalApp.load_more_map[user.login]) {
-			var load_more_btn = d3Element.append("svg:text")
+			var load_more_btn = d3Element
+				.append("svg:g")
+				.attr("transform","translate(155,56)")
+				.attr("class","show-connections");
+
+			load_more_btn
+				.append("svg:rect")
+				.attr("class","show-connections-bg")
+				.attr("width",60)
+				.attr("height",20)
+				.attr("rx",3)
+				.attr("ry",3);
+
+			load_more_btn
+				.append("svg:text")
 				.text("Load More")
+				.attr("x", 5)
+				.attr("y", 14)
 				.on("click", function (u) {
 					NodalApp.load_more_map[u.login]();
 				});
@@ -640,8 +648,8 @@
 		d3Element
 			.append("svg:text")
 			.attr("class","close-expanded")
-			.text("x")
-			.attr("x", 240)
+			.text("*")
+			.attr("x", 237)
 			.attr("y", 18)
 			.on("click", function (d) {
 				d3.event.stopPropagation();

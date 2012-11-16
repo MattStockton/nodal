@@ -1,3 +1,11 @@
+@font-face {
+	font-family: 'Pictos';
+	src: url('pictos/pictos-web.eot');
+	src: local('ð'), url('pictos/pictos-web.woff') format('woff'), url('pictos/pictos-web.ttf') format('truetype'), url('pictos/pictos-web.svg#webfontphKv1xv9') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
 html, body {
 	margin: 0;
 	font-family: "Source Sans Pro", "Helvetica", Arial, sans-serif;
@@ -38,7 +46,9 @@ html .clearfix:after {
 	padding: 5px 10px;
 	margin: 0;
 }
-
+.btn:hover {
+	border: 1px solid #AAA;
+}
 #logo {
 	float: left;
 	padding: 0 10px;
@@ -70,17 +80,37 @@ html .clearfix:after {
 #loading span {
 	display: block;
 	float: right;
-	font-size: 10px;
-	text-transform: uppercase;
 	background: #FEFEC5;
-	color: #000;
-	font-weight: bold;
 	padding: 5px 10px 3px 10px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	line-height: 1em;
 	border: 1px solid #F0F0A2;
+}
+#system_feedback {
+	float: right;
+	padding: 12px;
+	height: 24px;
+}
+#system_feedback span {
+	display: block;
+	float: right;
+	font-size: 14px;
+	padding: 0 10px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	line-height: 24px;
+	height: 24px;
+	color: #FFF;
+	text-shadow: 0 0 1px #555;
+}
+#system_feedback span.failure {
+	background: #CE0000;
+}
+#system_feedback span.success {
+	background: #29B90B;
 }
 #sliders {
 	display: none;
@@ -152,14 +182,38 @@ input[type=range] {
 	width: 0;
 	position: absolute;
 	pointer-events: none;
-}
-
-.about-nodal:after {
 	border-color: rgba(0, 0, 0, 0);
 	border-bottom-color: rgba(0,0,0,0.7);
 	border-width: 5px;
 	left: 169px;
 	margin-left: -10px;
+}
+.about-nodal .fork-link {
+	display: block;
+	background: #F6284C; /* Old browsers */
+	background: -moz-linear-gradient(top,  #F6284C 0%, #CB142D 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F6284C), color-stop(100%,#CB142D)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #F6284C 0%,#CB142D 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #F6284C 0%,#CB142D 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #F6284C 0%,#CB142D 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #F6284C 0%,#CB142D 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F6284C', endColorstr='#CB142D',GradientType=0 ); /* IE6-9 */
+	color: #FFF;
+	text-shadow: 0 1px 0 #222;
+	text-align: center;
+	padding: 10px 0;
+	font-size: 14px;
+	border: 1px solid #890303;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	text-decoration: none;
+}
+.drag-tip {
+	position: absolute;
+	top: 60px;
+	left: 10px;
+	display: none;
 }
 
 
@@ -202,6 +256,16 @@ g.expanded:hover {
 g.expanded text.close-expanded {
 	font-size: 12px;
 	fill: #999;
+}
+g.expanded text.username {
+	font-size: 16px;
+	text-decoration: underline;
+}
+g.expanded text.username:hover {
+	cursor: pointer;
+}
+g.expanded text.close-expanded {
+	font-family: "Pictos";
 }
 g.expanded text.close-expanded:hover {
 	cursor: pointer;
@@ -276,21 +340,7 @@ circle.aux-border {
 
 .github-follow {
 	cursor: pointer;
-	background: #ff3019; /* Old browsers */
-	background: -moz-linear-gradient(top,  #ff3019 0%, #cf0404 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ff3019), color-stop(100%,#cf0404)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ff3019 0%,#cf0404 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #ff3019 0%,#cf0404 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #ff3019 0%,#cf0404 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #ff3019 0%,#cf0404 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff3019', endColorstr='#cf0404',GradientType=0 ); /* IE6-9 */
-	color: #FFF;
-	text-shadow: 0 1px 0 #222;
 	font-size: 14px;
-	border: 1px solid #890303;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
 }
 
 
@@ -384,7 +434,17 @@ ul.flashes li {
 	border: 1px solid #F10;
 	color: #F10;
 	padding: 10px;
-
+}
+.login-alert {
+	padding: 10px 0;
+	text-align: center;
+}
+.login-alert span {
+	display: block;
+	padding: 20px 10px 10px 10px;
+	text-align: center;
+	font-family: "Pictos";
+}
 
 #error_page {
 	margin: 20px auto;
