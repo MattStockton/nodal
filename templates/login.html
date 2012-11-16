@@ -65,7 +65,7 @@ $(document).ready(function(){
     Nodal.add_stats_listener(function (data) {
     	if(data.API_403_Error){
             $(".login-alert").remove();
-            var $dalert = $('<div class="login-alert">No more API calls remaining.<br>Login to continue using Nodal.<br><span>}</span></div>');
+            var $dalert = $('<div class="login-alert">No more API calls remaining.<br>Login to continue using Nodal.<br><span><img src="/static/images/alert-arrow-down.png"></span></div>');
             $dalert.prependTo(".github-option");
     	}
     });
@@ -89,7 +89,8 @@ $(document).ready(function(){
         }
     }).click(function () { this.select(); });
 
-    $("#search_form").show();   
+    $("#search_form").show();
+    
 });
 </script>
 

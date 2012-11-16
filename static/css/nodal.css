@@ -1,11 +1,3 @@
-@font-face {
-	font-family: 'Pictos';
-	src: url('pictos/pictos-web.eot');
-	src: local('ð'), url('pictos/pictos-web.woff') format('woff'), url('pictos/pictos-web.ttf') format('truetype'), url('pictos/pictos-web.svg#webfontphKv1xv9') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
 html, body {
 	margin: 0;
 	font-family: "Source Sans Pro", "Helvetica", Arial, sans-serif;
@@ -264,9 +256,6 @@ g.expanded text.username {
 g.expanded text.username:hover {
 	cursor: pointer;
 }
-g.expanded text.close-expanded {
-	font-family: "Pictos";
-}
 g.expanded text.close-expanded:hover {
 	cursor: pointer;
 }
@@ -449,7 +438,6 @@ ul.flashes li {
 	display: block;
 	padding: 20px 10px 10px 10px;
 	text-align: center;
-	font-family: "Pictos";
 }
 
 #error_page {
