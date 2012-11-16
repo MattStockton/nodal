@@ -11,5 +11,3 @@ We see a future where data can be navigated visually. We want more intuitive con
 D3.js is the primary library for drawing the graph. [jQuery](http://jquery.com/) and [Underscore](http://underscorejs.org/) are fantastic utilities for getting the bulk of our JavaScript needs done.
 
 We use [Python](http://www.python.org/) and [Flask](http://flask.pocoo.org/) on the backend. The official public demo is hosted on [Heroku](http://www.heroku.com/).
-
-Some icons are from the [Pictos](http://pictos.cc/) set.
