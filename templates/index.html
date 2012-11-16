@@ -598,7 +598,7 @@
 			.attr("y", 25)
 			.attr("class", "username")
 			.text(function(d){
-				return d.login;
+				return d.name || d.login;
 			})
 			.on("click", function (d) {
 	        	window.open('https://github.com/' + d.login, '_blank');
