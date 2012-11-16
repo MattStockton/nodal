@@ -347,12 +347,12 @@ circle.aux-border {
 
 /* login */
 body.login {
-	background: url(../images/logo-bg.png) no-repeat -150px -150px #FFF;
+	background: url(../images/nodal-example.png) no-repeat center -120px #FFF;
 }
 #login {
-	margin: 20px;
+	margin: 50px auto;
 	width: 350px;
-	background: rgba(255,255,255,0.9);
+	background: rgba(255,255,255,0.93);
 	border: 1px solid #EEEEE8;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -373,7 +373,7 @@ body.login {
 .github-option button {
 	display: block;
 	border: 1px solid #EEE;
-	background: url(../images/github-logo-btn.png) no-repeat 20px 10px rgba(238,238,232,0.6);
+	background: url(../images/github-logo-btn.png) no-repeat 20px 10px rgba(238,238,232,0.8);
 	color: #555;
 	font-size: 16px;
 	padding: 12px 20px 12px 50px;
@@ -418,6 +418,9 @@ body.login {
 .explanation ul li {
 	font-size: 14px;
 	margin: 15px 0;
+}
+.explanation ul li:last-child {
+	margin-bottom: 0;
 }
 .explanation strong {
 	color: #F6284C;
