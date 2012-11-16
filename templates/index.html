@@ -34,7 +34,13 @@
 					</div>
 				</div>
 			</span>
-			<button id="logout" type="button" class="btn">Logout</button>
+			
+			{% if access_token == "" %}
+			     <button type="button" class="js-login btn">Login</button>
+			{% else %}
+			     <button type="button" class="js-logout btn">Logout</button>
+			{% endif %}
+
 		</div>
 		<div class="api-info" title="Huh? This is the number of requests your API token has left with GitHub. If you login you get 5000, otherwise just 60.">
 			<span class="api-info-label">Requests remaining:</span><span id="api_limit_info"></span>
@@ -299,9 +305,13 @@
 		$("#adjust_phyics").click(function(){
 			$("#sliders").toggle();
 		});
-		$("#logout").click(function(){
+		$(".js-logout").click(function(){
 			window.location = "/logout";
 		});
+		
+	    $(".js-login").click(function(){
+	            window.location = "/";
+	    });
 		
 		$("#force_linkdistance").change(function(){
 			force.linkDistance(this.value).stop().start();
@@ -335,13 +345,14 @@
 				var logins = _.pluck(selectedPeople, "login");
 
 				var done_callback = function(success){
-					if(success){
-						$("#loading").hide();
-						$(".selection-modal").remove();
-						$("#system_feedback").empty().html('<span class="success">Follow success</span>').fadeOut(10000);
-					} else {
-						$("#system_feedback").empty().html('<span class="failure">A problem trying to follow</span>').fadeOut(10000);
+					var new_html = success ? '<span class="success">Follow success</span>' : '<span class="failure">A problem trying to follow</span>';
+					$("#loading").hide();
+					
+					if(success){	
+                        $(".selection-modal").remove();
 					}
+					
+					show_system_feedback(new_html);
 				};
 				Nodal.follow_users(logins, done_callback);
 			}
@@ -377,6 +388,10 @@
 
 		Nodal.add_stats_listener(function (data) {
 			$("#api_limit_info").html(data.API_RateLimit_Remaining + "/" + data.API_RateLimit_Limit);
+			
+			if(data.API_403_Error){
+				show_system_feedback('<span class="failure">No more API calls left. Please login!</span>');
+			}
 		});
 
 		$("#about_nodal_btn").on("click",function(){
@@ -390,7 +405,10 @@
 		var hide_drag_tip = function(){
 			$(".drag-tip").fadeOut();
 		};
-		_.delay(show_drag_tip, 5000);
+		
+		if(github_access_token != ""){
+	        _.delay(show_drag_tip, 5000);			
+		}
 	});
 
 	function setupSelectionBoxAttributes(selectionBox){
@@ -461,6 +479,15 @@
 		});
 	};
 
+	var show_system_feedback = function(html_feedback){
+        $("#system_feedback").empty().html(html_feedback).fadeOut(3000, 
+                function(){
+                   $("#system_feedback").empty().show();
+                   
+                }
+         );
+	}
+	
 	var getAndMergeFollowers = function (user, callback, network_loader) {
 		var groupToUse = getNextGroup();
 

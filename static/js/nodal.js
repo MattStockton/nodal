@@ -14,11 +14,21 @@
 		API_BASE_URL: "https://api.github.com/",
 
 		Util: {
+			handle_error_callback : function(jqXHR, textStatus, errorThrown){
+				if(jqXHR.status == 403){
+					GitHubNodal.Stats.API_RateLimit_Limit = 0;
+					GitHubNodal.Stats.API_RateLimit_Remaining = 0;
+					GitHubNodal.Stats.API_403_Error = true;
+					
+					signal_listeners("Stats", GitHubNodal.Stats);
+				}
+			},
 			catch_api_call: function (callback) {
 				return function (data, text_status, jqXHR) {
 					GitHubNodal.Stats.API_RateLimit_Limit = jqXHR.getResponseHeader("X-RateLimit-Limit");
 					GitHubNodal.Stats.API_RateLimit_Remaining = jqXHR.getResponseHeader("X-RateLimit-Remaining");
-
+					GitHubNodal.Stats.API_403_Error = false;
+					
 					signal_listeners("Stats", GitHubNodal.Stats);
 
 					if (callback) callback(data, text_status, jqXHR);
@@ -26,7 +36,8 @@
 			},
 
 			get: function (url, callback) {
-				return $.get(url, GitHubNodal.Util.catch_api_call(callback), "json");
+				return $.get(url, GitHubNodal.Util.catch_api_call(callback), "json")
+					.error(GitHubNodal.Util.handle_error_callback);
 			},
 
 			put: function (url, callback) {
@@ -34,6 +45,7 @@
 					type: 'PUT',
 					url: url,
 					success: GitHubNodal.Util.catch_api_call(callback),
+					error: GitHubNodal.Util.handle_error_callback,
 					dataType: "json"
 				});
 			},
@@ -48,6 +60,7 @@
 		Stats: {
 			API_RateLimit_Limit: 0,
 			API_RateLimit_Remaining: 0,
+			API_403_Error : false
 		}
 	};
 
