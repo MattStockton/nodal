@@ -347,12 +347,12 @@ circle.aux-border {
 
 /* login */
 body.login {
-	background: url(../images/logo-bg.png) no-repeat -150px -150px #FFF;
+	background: url(../images/nodal-example.png) no-repeat center -120px #FFF;
 }
 #login {
-	margin: 20px;
+	margin: 50px auto;
 	width: 350px;
-	background: rgba(255,255,255,0.9);
+	background: rgba(255,255,255,0.93);
 	border: 1px solid #EEEEE8;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -373,21 +373,24 @@ body.login {
 .github-option button {
 	display: block;
 	border: 1px solid #EEE;
-	background: url(../images/github-logo-btn.png) no-repeat 20px 10px rgba(238,238,232,0.6);
-	color: #555;
+	background: rgba(246,40,76,0.7);
+	color: #FFF;
 	font-size: 16px;
-	padding: 12px 20px 12px 50px;
+	padding: 12px 20px;
 	font-family: "Source Sans Pro", "Helvetica", Arial, sans-serif;
 	width: 100%;
+	border: 1px solid #D32241;
 }
 .github-option button:hover {
-	background-color: #EEEEE8;
+	background-color: rgba(246,40,76,1);
+	border: 1px solid #B91E39;
 }
 .search-option {
 	padding: 20px;
 	border-bottom: 1px solid #EEEEE8;
 }
 .search-option label {
+	font-weight: bold;
 	display: block;
 	font-size: 13px;
 	margin-bottom: 8px;
@@ -418,6 +421,9 @@ body.login {
 .explanation ul li {
 	font-size: 14px;
 	margin: 15px 0;
+}
+.explanation ul li:last-child {
+	margin-bottom: 0;
 }
 .explanation strong {
 	color: #F6284C;

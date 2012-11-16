@@ -84,7 +84,7 @@
 		</div>
 	</div>
 </div>
-<div class="drag-tip"><img src="/static/images/drag-tip.gif"></div>
+<div class="drag-tip">Try dragging to select people</div>
 <div id="chart"></div>
 
 <script src="static/js/jquery-1.8.2.min.js"></script>
@@ -399,7 +399,7 @@
 		});
 
 		var show_drag_tip = function(){
-			$(".drag-tip").show();
+			$(".drag-tip").fadeIn();
 			_.delay(hide_drag_tip, 5000);
 		};
 		var hide_drag_tip = function(){
