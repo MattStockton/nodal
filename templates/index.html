@@ -35,7 +35,9 @@
 			</span>
 			<button id="logout" type="button" class="btn">Logout</button>
 		</div>
-		<div class="api-info" title="Huh? This is the number of requests your API token has left with GitHub. You get 5000 requests if you personally log in."><span class="api-info-label">Requests remaining:</span><span id="api_limit_info"></span></div>
+		<div class="api-info" title="Huh? This is the number of requests your API token has left with GitHub. If you login you get 5000, otherwise just 60.">
+			<span class="api-info-label">Requests remaining:</span><span id="api_limit_info"></span>
+		</div>
 		<div id="search_form" class="nav-search">
 			<input id="search_field" placeholder="Search for a name, e.g. mbostock"/>
 		</div>
@@ -166,7 +168,7 @@
 		.attr("r", 24);
 
 	var redrawGraphsAndNodes = function () {
-		
+
       force.nodes(force.nodes())
          .links(force.links())
          .start();
@@ -200,11 +202,11 @@
       node.exit().remove();
 
       var people = svg.selectAll("g.person");
-      people.each(function(d){ 
+      people.each(function(d){
     	   if(d.center){
-    		   doCenterNodeInsert(d3.select(this))  
+    		   showExpandedView(d3.select(this))
     	   } else {
-    		   doAuxNodeInsert(d3.select(this)); 
+    		   showPictureOnlyView(d3.select(this));
     	   }
       });
 
@@ -212,7 +214,7 @@
       $("svg").find("line.link").detach().prependTo($("svg"));
       // Make sure all expanded people are at ene end for layering purposes
       forceExpandedPeopleToTop();
-            
+
       force.stop();
       force.gravity(0.03);
       force.start();
@@ -220,7 +222,7 @@
 
       $("#loading").hide();
 	};
-	
+
 	var selectionBox = svg.selectAll("rect.selection-box")
 		.data([rectData])
 		.enter().append("svg:rect")
@@ -505,7 +507,7 @@
 		var user = initialPersonId;
 
 		// check if person has been fully loaded
-		if (!_.isObject(user) || !user.followers) {
+		if (!user || !user.detail_loaded) {
 
 			Nodal.get_user_detail(user, function (user_detail) {
 
@@ -531,10 +533,10 @@
 		}
 	};
 
-	function doCenterNodeInsert(d3Element){		
+	function showExpandedView(d3Element){
 	    // Remove all child elements of the person
 		d3.selectAll(d3Element[0][0].childNodes).remove();
-		
+
 		d3Element.attr("class", "person expanded");
 
 		d3Element
@@ -569,7 +571,15 @@
 			.attr("y", 48)
 			.style("font-size", 11)
 			.text(function(d){
-				return "Repos: 6 - Followers: 117";
+				var tmpl = _.template(
+						"<%= repos %> public repo<%= repos == 1 ? '' : 's' %>, " +
+						"<%= followers %> follower<%= followers == 1 ? '' : 's' %>, " +
+						"follows <%= following %>");
+				return tmpl({
+					repos: d.public_repos,
+					followers: d.followers,
+					following: d.following
+				});
 			});
 
 		var showConnectionsBtn = d3Element
@@ -591,7 +601,7 @@
 
 		showConnectionsBtn
 			.append("svg:text")
-			.text("Show Connections")
+			.text("Show Followers")
 			.attr("x", 5)
 			.attr("y", 14);
 
@@ -642,17 +652,17 @@
 				d.center = false;
 				d.fixed = false;
 				// Re-insert as an aux node
-				doAuxNodeInsert(d3Element);
+				showPictureOnlyView(d3Element);
 				forceExpandedPeopleToTop();
 
 				force.stop().start();
 			});
 	}
 
-	function doAuxNodeInsert(d3Element){
+	function showPictureOnlyView(d3Element){
 		// Remove all child elements of the person
 		d3.selectAll(d3Element[0][0].childNodes).remove();
-		
+
 		d3Element.attr("class","person");
 
 		// set up circle portrait with clipping just to the pic
@@ -706,23 +716,39 @@
 		}).on("mouseout",function(d){
 			name_hover.attr("style","display:none");
 		}).on("click", function(d){
-			rectData.resetRectSelection();
-			setupSelectionBoxAttributes(svg.select("rect.selection-box"));
+			var self = this;
+			var expand_view = function () {
+				rectData.resetRectSelection();
+				setupSelectionBoxAttributes(svg.select("rect.selection-box"));
 
-			d3Element.selectAll("g.name-hover").remove();
+				d3Element.selectAll("g.name-hover").remove();
 
-			// This is the circle_portriat
-			d3.select(this).attr("clip-path", "");
+				// This is the circle_portriat
+				d3.select(self).attr("clip-path", "");
 
-			d.center = true;
-			d.fixed = true;
-			// Re-insert the person element as a center node
-			doCenterNodeInsert(d3Element);
-			forceExpandedPeopleToTop();
-			force.start();
+				d.center = true;
+				d.fixed = true;
+
+				// Re-insert the person element as a center node
+				showExpandedView(d3Element);
+				forceExpandedPeopleToTop();
+				force.start();
+			};
+
+			if (!d.detail_loaded) {
+				Nodal.get_user_detail(d, function (user_detail) {
+					for (var detail in user_detail) {
+						d[detail] = user_detail[detail];
+					}
+
+					expand_view();
+				});
+			} else {
+				expand_view();
+			}
 		});
 	}
-	
+
 	function forceExpandedPeopleToTop(){
 	      $("svg").find(".person.expanded").detach().appendTo($("svg"));
 	}
