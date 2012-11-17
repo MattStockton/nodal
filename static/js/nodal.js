@@ -28,6 +28,9 @@
 					GitHubNodal.Stats.API_RateLimit_Limit = jqXHR.getResponseHeader("X-RateLimit-Limit");
 					GitHubNodal.Stats.API_RateLimit_Remaining = jqXHR.getResponseHeader("X-RateLimit-Remaining");
 					GitHubNodal.Stats.API_403_Error = false;
+					// Some browsers (e.g. Firefox and Safari) have issues with response headers / CORS (http://bugs.jquery.com/ticket/10338)
+					// We will just disable functionality requiring this header info for now
+					GitHubNodal.Stats.API_Header_Issue = (GitHubNodal.Stats.API_RateLimit_Limit == null);
 					
 					signal_listeners("Stats", GitHubNodal.Stats);
 

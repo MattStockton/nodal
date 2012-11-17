@@ -42,7 +42,7 @@
 
 		</div>
 		<div class="api-info" title="Huh? This is the number of requests your API token has left with GitHub. If you login you get 5000, otherwise just 60.">
-			<span class="api-info-label">Requests remaining:</span><span id="api_limit_info"></span>
+			<span class="api-info-label" id="api_limit_info"></span>
 		</div>
 		<div id="search_form" class="nav-search">
 			<input id="search_field" placeholder="Search for a name, e.g. mbostock"/>
@@ -100,6 +100,8 @@
 		numCenterNodes = 0,
 		color = d3.scale.category20(),
 		force = d3.layout.force();
+	
+	var should_show_load_more = true;
 
 	var missing_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAIAAACR5s1WAAAEBUlEQVRYw4VYCXIjIQzk//9b7xDHThwfycaxA7xg5TmgpRbjqikXwwASrdblkHJJOben6NflyTLfPpXHQyvzMjMN6qusnMfLb64z47IwvhTcgNtwaUapeChpvyy2x+YqHg8XJcwRWd8PVcmk2bKLt+ir0/kGs2DwQU0TqGyUM0j0RCIGsxErzCBxQqJ0YPdM4J2iedO+tmXGBI1bj0EAxpVsjVIQ6gz8sqYp2vz1EyCa9RoiZvEkgYHNAou2EeCRabqMgaRuCS4fXSqp22urGdq6CukHmDtygq1ejC8lLbvezMLuBQ9jF2u15h3aFo4rk0cgPxIaSHGFrExhA71DBTXHIfWdyB2AyPYQdHXLpPoatI6aNRTaPO/XIBMZkbkERslkjqLjHRu49CDR3NS3Ii3Zy4KziJyWSfOb0sfpNGy3mxj/DIM8Mj6ezzLf1CoueY0RC+QOT16FywSx75+fl91ukj09iypR5q+3G8PmntM4Uc3jfPboKXfd7vcib5IKg1mhl92+4pFN9NTaVN4EmxWRQZ5TCeYgMiIe9ZE13QDabFSUEuBCmpuU1eT378uLKxh0imIdThCcjKo2wc1GbhUjr/+uVxRZqUB6DLJSG7QkLk0wYq6ERQPm6XJZsQJQZDh/fjruRtFoeg0m/SRVltl0NRIC3WFwX+URB+aKhGIx1hPsCJ7iSbFykRrjAkA03DTlmUnlKCUkTwkuUKfNcj+Q7dpinj/OSLScnKgMqJMhexWKm/qAmJEixEjSWKk6EpNCk/I7TGCJXACysA29t/t9Ey3yGweV4fb765c2Tk6o5si+jgY3GcTX1/U4ITrJGq5ceq1Dq7aJGZY71Uzn2UuHftCM4skrhR03V8EWov1CqG6W7NAH45E73NizMhMM5tlN6xrGe0odB3k8kr2ek10DE7hgMRkVq0Uh5vnyuXt/Z0NUeu4PBzGHEJPMz15aVBvYbxTnmcvX15jBTdZQqhg32e7fZJfTP3IbuNbyjr/i8VI19RyBs4ZRSPbOyawVLhbgwH8HYJlzqCGyHk1x4llmfwwOx6MpEFUCy8Vp0KbB4XjiWsG9t5vNzVjuo/qa3DEHDm7335XLVbQ38QkquEB47fZhtiFGJraz/HQ1eDhFXfypZZepyKD/P4Jt5hdt3j4+VrODI6mDSpuUMzkh5DmVY4xayDEV9a4rutF6WgkFX/SC6Y5bX9sQY8zwT+zf1dSbOtm2MXDC7crhfwFpYEhqXE1aK8xQX6Vx4nYmJNtitKp6MxYpmxifugCxBOFRCH1ff8y/WHOcyJS3VFUNYGwi3NJGrdhPKG2yZnmVRbP3b2Gtqvto0ycPLUbiUQBnNkcuXIFpJTq2cOgSXQzQcZYOUaWq//5preSxUIdvAAAAAElFTkSuQmCC";
 
@@ -329,8 +331,14 @@
 		$("#search_form").show();
 
 		Nodal.add_stats_listener(function (data) {
-			$("#api_limit_info").html(data.API_RateLimit_Remaining + "/" + data.API_RateLimit_Limit);
 			
+			if(data.API_Header_Issue){
+				should_show_load_more = false;
+				$("#api_limit_info").html("");
+			} else {
+			    $("#api_limit_info").html("Requests Remaining: " + data.API_RateLimit_Remaining + "/" + data.API_RateLimit_Limit);
+			}
+						
 			if(data.API_403_Error){
 				showSystemFeedback('<span class="failure">No more API calls left. Please login!</span>');
 			}
@@ -646,7 +654,7 @@
 			.attr("y", 14);
 			
 		var user = d3Element.data()[0];
-		if (NodalApp.load_more_map[user.login]) {
+		if (NodalApp.load_more_map[user.login] && should_show_load_more) {
 			var load_more_btn = d3Element
 				.append("svg:g")
 				.attr("transform","translate(155,56)")
@@ -735,13 +743,13 @@
 			.attr("transform","translate(10,16)")
 			.text(function(d){ return d.login; });
 
-		var name_hover_width = name_hover.select("text.name-hover-text").node().getComputedTextLength();
-
 		name_hover
 			.select("rect.name-hover-rect")
 			.attr("rx",5)
 			.attr("ry",5)
-			.attr("width",name_hover_width+20)
+			.attr("width",function(d){
+				return d.login ? (d.login.length * 8) + 20 : 0;
+			})
 			.attr("height",24);
 
 		circle_portrait.on("mouseover", function(d){
