@@ -97,7 +97,7 @@
     var start_username = "{{start_username}}";
 
 	var width = $(window).width(),
-		height = $(window).height() - 54,
+		height = $(window).height() - 55,
 		numCenterNodes = 0,
 		color = d3.scale.category20(),
 		force = d3.layout.force();
@@ -618,7 +618,7 @@
 			.append("svg:text")
 			.attr("x", 64)
 			.attr("y", 45)
-			.style("font-size", 11)
+			.attr("class","user-meta")
 			.text(function(d){
 				var tmpl = _.template(
 						"<%= repos %> repo<%= repos == 1 ? '' : 's' %>, " +
@@ -749,7 +749,7 @@
 			.attr("rx",5)
 			.attr("ry",5)
 			.attr("width",function(d){
-				return d.login ? (d.login.length * 8) + 20 : 0;
+				return d.login ? (d.login.length * 8) : 0;
 			})
 			.attr("height",24);
 

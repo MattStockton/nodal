@@ -259,6 +259,9 @@ g.expanded text.username:hover {
 g.expanded text.close-expanded:hover {
 	cursor: pointer;
 }
+g.expanded text.user-meta {
+	font-size: 12px;
+}
 g.show-connections:hover {
 	cursor: pointer;
 }
