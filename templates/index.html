@@ -14,6 +14,7 @@
 	<link type="text/css" rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.24.custom.css"/>
 	<link type="text/css" rel="stylesheet" href="static/css/nodal.css"/>
 
+    {% include 'ga.script' %}
 </head>
 <body>
 
@@ -749,7 +750,7 @@
 			.attr("rx",5)
 			.attr("ry",5)
 			.attr("width",function(d){
-				return d.login ? (d.login.length * 8) : 0;
+				return d.login ? (d.login.length * 7) + 20 : 0;
 			})
 			.attr("height",24);
 

@@ -3,10 +3,13 @@ import requests, sys, os
 
 app = Flask(__name__)
 app.debug = False
-app.secret_key = os.environ.get('APP_SECRET_KEY',None)
+app.secret_key = os.environ.get('APP_SECRET_KEY', None)
 
-GITHUB_API_CLIENT_ID = os.environ.get("GITHUB_API_CLIENT_ID",None)
-GITHUB_API_CLIENT_SECRET = os.environ.get("GITHUB_API_CLIENT_SECRET",None)
+GITHUB_API_CLIENT_ID = os.environ.get("GITHUB_API_CLIENT_ID", None)
+GITHUB_API_CLIENT_SECRET = os.environ.get("GITHUB_API_CLIENT_SECRET", None)
+
+GA_ACCOUNT = os.environ.get("GA_ACCOUNT", None)
+GA_DOMAIN_NAME = os.environ.get("GA_DOMAIN_NAME", None)
 
 PROBLEM_LOGGING_IN_ERROR = "There was a problem logging into Nodal. Please try again"
 AUTHORIZATION_ERROR = "You must authorize Nodal in order to use it!"
@@ -21,7 +24,7 @@ def error_encountered(error):
 
 @app.route('/login', methods=['GET'])
 def login():
-	return render_template("login.html", client_id=GITHUB_API_CLIENT_ID)
+	return render_template("login.html", client_id=GITHUB_API_CLIENT_ID, ga_account=GA_ACCOUNT, ga_domain_name=GA_DOMAIN_NAME)
 
 @app.route('/logout', methods=['GET'])
 def logout():
@@ -31,13 +34,13 @@ def logout():
 @app.route("/", methods=['GET'])
 def index():
 	if 'access_token' in session:
-		return render_template("index.html", access_token=session["access_token"])
+		return render_template("index.html", access_token=session["access_token"], ga_account=GA_ACCOUNT, ga_domain_name=GA_DOMAIN_NAME)
 	return redirect(url_for('login'))
 
 @app.route("/without-login", methods=['GET'])
 def index_without_login():
 	username = request.args.get('username',"");
-	return render_template("index.html", access_token="", start_username=username)
+	return render_template("index.html", access_token="", start_username=username, ga_account=GA_ACCOUNT, ga_domain_name=GA_DOMAIN_NAME)
 
 @app.route('/githubauth', methods=['GET'])
 def github_auth():
